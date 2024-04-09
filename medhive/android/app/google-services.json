@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "19106324265",
+    "project_id": "medhive-da119",
+    "storage_bucket": "medhive-da119.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19106324265:android:df56dec4059961273e2138",
+        "android_client_info": {
+          "package_name": "com.example.medhive"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMWs7i2AFDyaYUEbWTyjn3G7MXlLD34aA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

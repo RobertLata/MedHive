@@ -1,6 +1,21 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-void main() {
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: 'AIzaSyAMWs7i2AFDyaYUEbWTyjn3G7MXlLD34aA',
+          appId: '1:19106324265:android:df56dec4059961273e2138',
+          messagingSenderId: '19106324265',
+          projectId: 'medhive-da119'));
+  } else {
+    await Firebase.initializeApp();
+  }
+
   runApp(const MyApp());
 }
 
