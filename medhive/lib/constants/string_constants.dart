@@ -11,3 +11,5 @@ String INVALID_PASSWORD = "Invalid password";
 String ACCOUNT_ALREADY_EXISTS_WITH_DIFFERENT_CREDENTIALS = "Credential is malformed or has expired";
 String INVALID_CREDENTIAL = "Invalid credential";
 String TERMS_AND_CONDITIONS_AGREEMENT = "Please agree to the Terms of Service and Privacy Policy if you wish to continue";
+String SUCCESSFUL_LOGIN = "Log in successfully";
+

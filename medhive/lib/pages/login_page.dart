@@ -33,7 +33,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
 
-  String logIn = "Log in";
+  String logIn = "Hey there,\nWelcome to MedHive";
   String emailText = "E-mail";
   String passwordText = "Password";
   String forgotPassword = "Forgot password?";
@@ -236,6 +236,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const BottomNavigator()),
             (route) => false);
+        showMhSnackbar(context, SUCCESSFUL_LOGIN,
+            isError: false);
       }
     } else {
       showMhSnackbar(context, authResponse.getMessage(context));
