@@ -43,7 +43,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           return true;
         },
         child: Scaffold(
-          backgroundColor: MhColors.mhWhite,
+          backgroundColor: MhColors.mhLightGrey,
           appBar: MhAppBarLogoRight(
             isBackVisible: true,
             onPressed: _popCurrentPage,

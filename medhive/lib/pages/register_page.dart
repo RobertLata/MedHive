@@ -60,7 +60,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     bool smallScreen = isSmallScreen(MediaQuery.of(context).size.height);
     return Scaffold(
       appBar: const MhAppBarLogoRight(),
-      backgroundColor: MhColors.mhWhite,
+      backgroundColor: MhColors.mhLightGrey,
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Column(
@@ -239,7 +239,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     TextSpan(
                         text: logIn,
                         style: MhTextStyle.bodyBoldStyle
-                            .copyWith(color: MhColors.mhGreen),
+                            .copyWith(color: MhColors.mhBlueLight),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             Navigator.of(context).pushAndRemoveUntil(
