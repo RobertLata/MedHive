@@ -74,6 +74,13 @@ class MhTextStyle {
     fontStyle: FontStyle.italic,
   );
 
+  static const TextStyle bottomNavBarText = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    fontStyle: FontStyle.normal,
+    height: 1.5,
+  );
+
 //body small 14
   static const TextStyle bodySmallRegularStyle = TextStyle(
     fontSize: 14,

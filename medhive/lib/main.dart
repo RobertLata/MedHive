@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/pages/initial_page_decider.dart';
 
 import 'constants/mh_theme.dart';
+import 'helpers/custom_scroll_behavior.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,9 +30,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Medhive',
+      title: 'MedHive',
       debugShowCheckedModeBanner: false,
       theme: customTheme,
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: child!,
+        );
+      },
       home: const InitialPageDecider(),
     );
   }

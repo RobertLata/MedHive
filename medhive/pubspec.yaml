@@ -20,6 +20,8 @@ dependencies:
   google_fonts: ^6.2.1
   google_sign_in: ^6.2.1
   flutter_signin_button: ^2.0.0
+  google_nav_bar: ^5.0.6
+  line_icons: ^2.0.3
 
 dev_dependencies:
   flutter_test:

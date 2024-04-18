@@ -17,7 +17,7 @@ import '../widgets/mh_button.dart';
 import '../widgets/mh_snackbar.dart';
 import '../widgets/mh_text_form_field.dart';
 import '../widgets/provider_sign_in_button.dart';
-import 'bottom_navigator.dart';
+import 'tab_decider.dart';
 import 'forgot_password_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -234,7 +234,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ref.read(logInPageProvider);
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const BottomNavigator()),
+            MaterialPageRoute(builder: (context) => const TabDecider()),
             (route) => false);
         showMhSnackbar(context, SUCCESSFUL_LOGIN,
             isError: false);

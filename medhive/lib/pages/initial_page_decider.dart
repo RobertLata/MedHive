@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../controllers/authentication_controllers.dart';
-import 'bottom_navigator.dart';
+import 'tab_decider.dart';
 import 'error_page.dart';
 import 'login_page.dart';
 
@@ -18,7 +18,7 @@ class InitialPageDecider extends ConsumerWidget {
           if (data != null) {
             // data contains all the user data
             // Both data.email and authState.asData?.value?.email contain te user's email
-            return const BottomNavigator();
+            return const TabDecider();
           }
           return const LoginPage();
         },

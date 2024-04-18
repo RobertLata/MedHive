@@ -6,6 +6,7 @@ class MhMargins {
   static const double mhLogoBottomMargin = 90.0;
   static const double snackbarPaddingVertical = 20;
   static const double snackbarPaddingHorizontal = 25;
+  static const double standardVerticalPadding = 20.0;
 
   static const double mhTextFieldBorderRadius = 35;
   static const double mediumMargin = 16;
@@ -23,7 +24,7 @@ class MhMargins {
   static const double mhButtonDefaultHeight = 55;
   static const double widgetHeightThreshold = 700;
   static const double mhButtonMediumHeight = 50;
-
+  static const double iconsSize = 28.0;
 
   // Logo
   static const double viLogoBottomMargin = 40;

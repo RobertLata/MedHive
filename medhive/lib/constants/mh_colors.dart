@@ -4,6 +4,7 @@ class MhColors {
   static const Color mhWhite = Color(0xFFFFFFFF);
   static const Color mhLightCream = Color(0xFFE6E4DD);
   static const Color mhLightGrey = Color(0xFFF8F8F8);
+  static const Color mhDarkGrey = Color(0xFF4A4646);
 
   static const Color mhBlueDisabled = Color(0x660a263d);
   static const Color mhBlueLight = Color(0xFF009FCF);

@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/string_constants.dart';
-import 'package:medhive/pages/bottom_navigator.dart';
+import 'package:medhive/pages/tab_decider.dart';
 import 'package:medhive/services/authentication_service.dart';
 
 import '../constants/authentication_response.dart';
@@ -255,7 +255,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       AuthenticationResponseEnum authResponse, BuildContext context) {
     if (authResponse == AuthenticationResponseEnum.authSuccess) {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const BottomNavigator()),
+          MaterialPageRoute(builder: (context) => const TabDecider()),
           (route) => false);
       showMhSnackbar(context, SUCCESSFUL_LOGIN, isError: false);
     } else {
