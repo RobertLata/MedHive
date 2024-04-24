@@ -33,12 +33,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _userName = TextEditingController();
   bool _isCheckboxChecked = false;
 
   // RegisterPage strings
   String accountSetUp = "Create you free MedHive account";
   String emailText = "E-mail";
   String passwordText = "Password";
+  String userNameText = "Username";
   String iHaveReadAndIAgreeWith = "I have read and I agree with";
   String continueText = "Continue";
   String logIn = "Log in";
@@ -102,12 +104,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       errorMessage: INVALID_EMAIL,
                     ),
                   ),
-                  const SizedBox(
-                    height: MhMargins.mediumMargin,
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: MhMargins.mediumMargin),
+                        horizontal: MhMargins.mediumMargin, vertical: MhMargins.smallMargin),
                     child: MhTextFormField(
                       textFieldType: TextFieldType.password,
                       hintName: passwordText,
@@ -116,6 +115,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           AuthenticationService.passwordValidation(
                               password, context),
                       errorMessage: INVALID_PASSWORD,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: MhMargins.mediumMargin),
+                    child: MhTextFormField(
+                      textFieldType: TextFieldType.name,
+                      hintName: userNameText,
+                      controller: _userName,
                     ),
                   ),
                   Padding(
@@ -168,10 +176,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                 .registerLoadingData();
                             final authMessage = await registerProvider
                                 .signUpUserWithEmailAndPassword(
-                                    _isCheckboxChecked,
-                                    context,
-                                    _password.text.trim(),
-                                    _email.text.trim());
+                              _isCheckboxChecked,
+                              context,
+                              _password.text.trim(),
+                              _email.text.trim(),
+                              _userName.text.trim(),
+                            );
                             if (mounted) {
                               ref
                                   .read(registerPathProvider.notifier)

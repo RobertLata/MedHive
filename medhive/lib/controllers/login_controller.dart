@@ -13,7 +13,7 @@ class LogInPageController extends AuthenticationService {
       BuildContext context) async {
     final authMessage = await signInWithGoogle(context);
     if (authMessage == AuthenticationResponseEnum.authSuccess) {
-      await firestoreRepository.addPrivateUser();
+      await firestoreRepository.addPrivateUser("");
     }
     return authMessage;
   }

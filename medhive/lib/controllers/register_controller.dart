@@ -21,7 +21,7 @@ class RegisterPageController extends AuthenticationService {
     if (isChecked == true) {
       final authMessage = await signInWithGoogle(context);
       if (authMessage == AuthenticationResponseEnum.authSuccess) {
-        await _firestoreRepository.addPrivateUser();
+        await _firestoreRepository.addPrivateUser("");
       }
       return authMessage;
     }
@@ -32,12 +32,13 @@ class RegisterPageController extends AuthenticationService {
       bool isCheckboxChecked,
       BuildContext context,
       String password,
-      String email) async {
+      String email,
+      String userName) async {
     bool isChecked = checkingCheckbox(isCheckboxChecked, context);
     if (isChecked == true) {
       final authResponse = await signUpWithEmailAndPassword(email, password);
       if (authResponse == AuthenticationResponseEnum.authSuccess) {
-        await _firestoreRepository.addPrivateUser();
+        await _firestoreRepository.addPrivateUser(userName);
       }
       return authResponse;
     }

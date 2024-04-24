@@ -13,7 +13,7 @@ class FirestoreRepository {
 
   final GenericFirestoreRepo genericFirestoreRepo;
 
-  Future<void> addPrivateUser() async {
+  Future<void> addPrivateUser(String? userName) async {
     final FirebaseAuth authInstance = FirebaseAuth.instance;
     String? photoUrl = authInstance.currentUser!.photoURL;
 
@@ -26,6 +26,7 @@ class FirestoreRepository {
       email: authInstance.currentUser!.email,
       name: authInstance.currentUser!.displayName,
       profileImage: photoUrl,
+      username: userName,
     );
 
     final jsonPrivateUser = privateUser.toJson();

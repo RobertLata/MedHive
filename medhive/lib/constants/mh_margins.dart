@@ -1,12 +1,12 @@
 class MhMargins {
   static const mhStandardPadding = 46.0;
-  static const mhStandardBorderRadius = 30.6;
+  static const mhStandardBorderRadius = 20.0;
   static const mhColorPickerTopPadding = 120.0;
   static const mhColorPickerBottomPadding = 60.0;
   static const double mhLogoBottomMargin = 90.0;
   static const double snackbarPaddingVertical = 20;
   static const double snackbarPaddingHorizontal = 25;
-  static const double standardVerticalPadding = 20.0;
+  static const double standardPadding = 20.0;
 
   static const double mhTextFieldBorderRadius = 35;
   static const double mediumMargin = 16;
