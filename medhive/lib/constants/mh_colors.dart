@@ -21,6 +21,7 @@ class MhColors {
   static const Color mhAuthDarkBlue = Color(0xFF416C91);
   static const Color mhAuthGrey = Color(0xFF797F8D);
   static const Color mhErrorRed = Color(0xFFDD5D50);
+  static const Color mhPurple = Color(0xFF6A53A5);
 
   static const Gradient mhBlueGreenGradient = LinearGradient(
     begin: Alignment.topCenter,

@@ -37,7 +37,7 @@ class _BottomNavigationTabsState extends ConsumerState<BottomNavigationTabs> {
             rippleColor: MhColors.mhBlueLight,
             hoverColor: MhColors.mhBlueLight,
             gap: MhMargins.extraSmallMargin,
-            activeColor: MhColors.mhBlueDark,
+            activeColor: MhColors.mhWhite,
             iconSize: MhMargins.iconsSize,
             padding: const EdgeInsets.symmetric(
                 horizontal: MhMargins.smallMargin,
@@ -46,7 +46,7 @@ class _BottomNavigationTabsState extends ConsumerState<BottomNavigationTabs> {
             tabBackgroundColor: MhColors.mhBlueLight,
             color: MhColors.mhDarkGrey,
             textStyle: MhTextStyle.bottomNavBarText
-                .copyWith(color: MhColors.mhBlueDark),
+                .copyWith(color: MhColors.mhWhite),
             tabs: [
               const GButton(
                 icon: LineIcons.home,

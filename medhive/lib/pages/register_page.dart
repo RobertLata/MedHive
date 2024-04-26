@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/string_constants.dart';
+import 'package:medhive/helpers/useful_information_helper.dart';
 import 'package:medhive/pages/tab_decider.dart';
 import 'package:medhive/services/authentication_service.dart';
 
@@ -12,6 +13,7 @@ import '../constants/mh_margins.dart';
 import '../constants/mh_style.dart';
 import '../controllers/register_controller.dart';
 import '../controllers/register_path_provider.dart';
+import '../helpers/cloud_firestore_helper.dart';
 import '../helpers/screen_size_helper.dart';
 import '../widgets/mh_appbar_logo_right.dart';
 import '../widgets/mh_button.dart';
@@ -106,7 +108,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: MhMargins.mediumMargin, vertical: MhMargins.smallMargin),
+                        horizontal: MhMargins.mediumMargin,
+                        vertical: MhMargins.smallMargin),
                     child: MhTextFormField(
                       textFieldType: TextFieldType.password,
                       hintName: passwordText,
@@ -145,7 +148,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             TextSpan(
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () async {
-                                  await _termConditionsDialog();
+                                  await UsefulInformationHelper
+                                      .termConditionsDialog(context);
                                 },
                               text: termsAndConditions,
                               style: MhTextStyle.bodyBoldStyle.copyWith(
@@ -186,7 +190,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                               ref
                                   .read(registerPathProvider.notifier)
                                   .registerNotLoadingData();
-                              _navigateUserOnSuccessfulRegistration(
+                              await _navigateUserOnSuccessfulRegistration(
                                   authMessage, context);
                             }
                           }
@@ -216,7 +220,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           ref
                               .read(registerPathProvider.notifier)
                               .registerNotLoadingData();
-                          _navigateUserOnSuccessfulRegistration(
+                          await _navigateUserOnSuccessfulRegistration(
                               authMessage, context);
                         }
                       },
@@ -261,55 +265,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     return _formKey.currentState!.validate();
   }
 
-  void _navigateUserOnSuccessfulRegistration(
-      AuthenticationResponseEnum authResponse, BuildContext context) {
+  Future<void> _navigateUserOnSuccessfulRegistration(
+      AuthenticationResponseEnum authResponse, BuildContext context) async {
     if (authResponse == AuthenticationResponseEnum.authSuccess) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const TabDecider()),
           (route) => false);
+      await CloudFirestoreHelper.updatePrivateUserAvatar(
+          'assets/images/male_avatar.png');
       showMhSnackbar(context, SUCCESSFUL_LOGIN, isError: false);
     } else {
       showMhSnackbar(context, authResponse.getMessage(context));
     }
-  }
-
-  Future<void> _termConditionsDialog() async {
-    return await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(termsAndConditions,
-              style: MhTextStyle.heading4Style
-                  .copyWith(color: MhColors.mhBlueDark)),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                Text(
-                    "By using the MedHive app, you agree to the following terms:\n\n"
-                    "1. Use of Service: MedHive provides a mobile platform for the delivery of pharmaceutical products. Our services are subject to availability, and we reserve the right to refuse service at our discretion.\n\n"
-                    "2. User Obligations: You agree to provide accurate information for the services provided and to use MedHive only for lawful purposes.\n\n"
-                    "3. Privacy: We respect your privacy and your personal information. Your use of the app signifies your consent to our privacy policies.\n\n"
-                    "4. Intellectual Property: MedHive and its original content, features, and functionality are owned by the MedHive Company and are protected by international copyright and trademark laws.\n\n"
-                    "5. Amendments: These Terms may be updated from time to time. Your continued use of the app will be regarded as acceptance of our updated terms.\n\n"
-                    "6. Governing Law: Your use of MedHive and any dispute arising out of such use is subject to the laws of the jurisdiction where our company is established.",
-                    style: MhTextStyle.bodyRegularStyle
-                        .copyWith(color: MhColors.mhBlueDark)),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text("Close",
-                  style: MhTextStyle.bodyBoldStyle
-                      .copyWith(color: MhColors.mhBlueDark)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   bool _isPasswordValid(String password) {

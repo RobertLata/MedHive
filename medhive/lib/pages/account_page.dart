@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
+import 'package:medhive/helpers/cloud_firestore_helper.dart';
 import 'package:medhive/pages/login_page.dart';
+import 'package:medhive/pages/setup_location_file.dart';
 import 'package:medhive/repositories/firebase_repository.dart';
 import 'package:medhive/services/authentication_service.dart';
+import 'package:medhive/widgets/mh_account_tile.dart';
 
 import '../constants/mh_colors.dart';
 import '../controllers/tab_controller.dart';
 import '../entities/private_user.dart';
+import '../helpers/useful_information_helper.dart';
 import '../widgets/mh_appbar_logo_right.dart';
+import 'credit_cards_page.dart';
 
 class AccountPage extends ConsumerStatefulWidget {
   const AccountPage({super.key});
@@ -25,7 +30,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
   Widget build(BuildContext context) {
     final firebaseController = ref.watch(firestoreRepositoryProvider);
 
-    Future<PrivateUser?> _getCurrentUser() async {
+    Future<PrivateUser?> getCurrentUser() async {
       final currentUser = await firebaseController
           .readPrivateUser(AuthenticationService.currentUserId);
 
@@ -33,13 +38,17 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     }
 
     return FutureBuilder<PrivateUser?>(
-        future: _getCurrentUser(),
+        future: getCurrentUser(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
               return const Scaffold(body: Center(child: Text("Error")));
             } else {
               final currentUser = snapshot.data;
+              if (currentUser?.profileImage ==
+                  'assets/images/female_avatar.png') {
+                _selectedAvatarIndex = 1;
+              }
               return Scaffold(
                 appBar: const MhAppBarLogoRight(),
                 backgroundColor: MhColors.mhLightGrey,
@@ -64,7 +73,9 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                   child: CircleAvatar(
                                     radius: 60,
                                     backgroundImage: AssetImage(
-                                        _selectedAvatarIndex == 0 ? 'assets/images/male_avatar.png' : 'assets/images/female_avatar.png'), // Your avatar image
+                                        _selectedAvatarIndex == 0
+                                            ? 'assets/images/male_avatar.png'
+                                            : 'assets/images/female_avatar.png'), // Your avatar image
                                   ),
                                 ),
                                 Align(
@@ -85,8 +96,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                                   Colors.grey.withOpacity(0.3),
                                               spreadRadius: 5,
                                               blurRadius: 7,
-                                              offset: Offset(0,
-                                                  3), // changes position of shadow
+                                              offset: const Offset(0, 2),
                                             ),
                                           ],
                                         ),
@@ -98,33 +108,109 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                 )
                               ],
                             ),
-                            Text(
-                              'Hello, ${currentUser!.username ?? currentUser.name ?? "there"}!',
-                              style: MhTextStyle.heading1Style,
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: MhMargins.smallMargin),
+                              child: Text(
+                                'Hello, ${currentUser!.username ?? currentUser.name ?? "there"}!',
+                                style: MhTextStyle.heading1Style
+                                    .copyWith(color: MhColors.mhBlueRegular),
+                              ),
                             )
                           ],
                         ),
                       ),
-                      ListTile(
-                        leading: Icon(Icons.location_on),
-                        title: Text('Adresele mele'),
-                        onTap: () {
-                          // Navigate to addresses
-                        },
+                      Padding(
+                        padding:
+                            const EdgeInsets.all(MhMargins.standardPadding),
+                        child: Text(
+                          "You're signed in as: ${currentUser.email}",
+                          style: MhTextStyle.bodyRegularStyle
+                              .copyWith(color: MhColors.mhBlueLight),
+                        ),
                       ),
-                      Text('Signed in as: ' +
-                          AuthenticationService.currentUser!.email!),
-                      ElevatedButton(
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          MhMargins.standardPadding,
+                          MhMargins.standardPadding,
+                          MhMargins.standardPadding,
+                          MhMargins.smallMargin,
+                        ),
+                        child: Text(
+                          "Your account",
+                          style: MhTextStyle.bodyRegularStyle
+                              .copyWith(color: MhColors.mhBlueRegular),
+                        ),
+                      ),
+                      MhAccountTile(
+                          text: 'Saved Addresses',
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const SetupLocationPage()));
+                          },
+                          icon: Icons.location_on),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 1.0),
+                        child: MhAccountTile(
+                            text: 'Credit Cards',
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                  const CreditCardsPage()));
+                            },
+                            icon: Icons.credit_card_outlined),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          MhMargins.standardPadding,
+                          MhMargins.standardPadding,
+                          MhMargins.standardPadding,
+                          MhMargins.smallMargin,
+                        ),
+                        child: Text(
+                          "Useful",
+                          style: MhTextStyle.bodyRegularStyle
+                              .copyWith(color: MhColors.mhBlueRegular),
+                        ),
+                      ),
+                      MhAccountTile(
+                          text: 'Terms, conditions and Data Privacy',
+                          onTap: () async {
+                            await UsefulInformationHelper.termConditionsDialog(
+                                context);
+                          },
+                          icon: Icons.info_outline),
+                      const SizedBox(height: MhMargins.mhStandardPadding),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
                           onPressed: () async {
                             await AuthenticationService().signOut();
                             _resetNavBarIndex(ref);
                             Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (route) => false);
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                              (route) => false,
+                            );
                           },
-                          child: Text('Sign out')),
-                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 1.0),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.zero, // No border radius
+                            ),
+                          ),
+                          child: Text(
+                            'Sign out',
+                            style: MhTextStyle.bodyRegularStyle
+                                .copyWith(color: MhColors.mhErrorRed),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
                           onPressed: () async {
                             await firebaseController.deletePrivateUser();
                             _resetNavBarIndex(ref);
@@ -134,7 +220,20 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                     builder: (context) => const LoginPage()),
                                 (route) => false);
                           },
-                          child: Text('Delete account'))
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                          ),
+                          child: Text(
+                            'Delete account',
+                            style: MhTextStyle.bodyRegularStyle
+                                .copyWith(color: MhColors.mhErrorRed),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -159,15 +258,25 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
-        // Use StatefulBuilder to create its own state for the modal
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return Container(
-              height: 200,
+              height: 250,
               child: Column(
                 children: <Widget>[
-                  Center(child: Text('Choose your avatar')),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: MhMargins.standardPadding,
+                        bottom: MhMargins.mhStandardPadding),
+                    child: Center(
+                        child: Text(
+                      'Choose your avatar',
+                      style: MhTextStyle.heading4Style
+                          .copyWith(color: MhColors.mhBlueLight),
+                    )),
+                  ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildAvatarStack(
                           'assets/images/male_avatar.png', 0, setModalState),
@@ -190,16 +299,16 @@ class _AccountPageState extends ConsumerState<AccountPage> {
       alignment: Alignment.bottomRight,
       children: [
         CircleAvatar(
-          radius: 80,
+          radius: 60,
           backgroundImage: AssetImage(imagePath),
         ),
         GestureDetector(
-          onTap: () {
+          onTap: () async {
             setModalState(() {
               _selectedAvatarIndex = index;
             });
-            setState(() {
-            });
+            setState(() {});
+            await CloudFirestoreHelper.updatePrivateUserAvatar(imagePath);
           },
           child: Icon(
             _selectedAvatarIndex == index
