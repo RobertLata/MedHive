@@ -1,6 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:medhive/constants/mh_colors.dart';
+import 'package:medhive/entities/credit_card.dart';
+import 'package:medhive/helpers/cloud_firestore_helper.dart';
+import 'package:medhive/widgets/mh_appbar_logo_right.dart';
+
+import '../constants/mh_button_style.dart';
+import '../constants/mh_margins.dart';
+import '../services/authentication_service.dart';
+import '../widgets/mh_button.dart';
 
 class CardValidationPage extends StatefulWidget {
   const CardValidationPage({super.key});
@@ -12,15 +21,11 @@ class CardValidationPage extends StatefulWidget {
 }
 
 class CardValidationPageState extends State<CardValidationPage> {
-  bool isLightTheme = false;
   String cardNumber = '';
   String expiryDate = '';
   String cardHolderName = '';
   String cvvCode = '';
   bool isCvvFocused = false;
-  bool useGlassMorphism = false;
-  bool useBackgroundImage = false;
-  bool useFloatingAnimation = true;
   final OutlineInputBorder border = OutlineInputBorder(
     borderSide: BorderSide(
       color: Colors.grey.withOpacity(0.7),
@@ -33,127 +38,104 @@ class CardValidationPageState extends State<CardValidationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Builder(
-        builder: (BuildContext context) {
-          return SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                CreditCardWidget(
-                  enableFloatingCard: useFloatingAnimation,
-                  glassmorphismConfig: _getGlassmorphismConfig(),
-                  cardNumber: cardNumber,
-                  expiryDate: expiryDate,
-                  cardHolderName: cardHolderName,
-                  cvvCode: cvvCode,
-                  frontCardBorder:
-                      useGlassMorphism ? null : Border.all(color: Colors.grey),
-                  backCardBorder:
-                      useGlassMorphism ? null : Border.all(color: Colors.grey),
-                  showBackView: isCvvFocused,
-                  obscureCardNumber: true,
-                  obscureCardCvv: true,
-                  isHolderNameVisible: true,
-                  cardBgColor: MhColors.mhBlueLight,
-                  isSwipeGestureEnabled: true,
-                  onCreditCardWidgetChange:
-                      (CreditCardBrand creditCardBrand) {},
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        CreditCardForm(
-                          formKey: formKey,
-                          obscureCvv: true,
-                          obscureNumber: true,
-                          cardNumber: cardNumber,
-                          cvvCode: cvvCode,
-                          isHolderNameVisible: true,
-                          isCardNumberVisible: true,
-                          isExpiryDateVisible: true,
-                          cardHolderName: cardHolderName,
-                          expiryDate: expiryDate,
-                          inputConfiguration: const InputConfiguration(
-                            cardNumberDecoration: InputDecoration(
-                              labelText: 'Number',
-                              hintText: 'XXXX XXXX XXXX XXXX',
-                            ),
-                            expiryDateDecoration: InputDecoration(
-                              labelText: 'Expired Date',
-                              hintText: 'XX/XX',
-                            ),
-                            cvvCodeDecoration: InputDecoration(
-                              labelText: 'CVV',
-                              hintText: 'XXX',
-                            ),
-                            cardHolderDecoration: InputDecoration(
-                              labelText: 'Card Holder',
-                            ),
-                          ),
-                          onCreditCardModelChange: onCreditCardModelChange,
-                        ),
-                        const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: _onValidate,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(8),
-                              ),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              'Validate',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'halter',
-                                fontSize: 14,
-                                package: 'flutter_credit_card',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
+      appBar: MhAppBarLogoRight(
+        isBackVisible: true,
+        onPressed: () {
+          Navigator.of(context).pop();
         },
       ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            CreditCardWidget(
+              enableFloatingCard: true,
+              glassmorphismConfig: null,
+              cardNumber: cardNumber,
+              expiryDate: expiryDate,
+              cardHolderName: cardHolderName,
+              cvvCode: cvvCode,
+              frontCardBorder: Border.all(color: Colors.grey),
+              backCardBorder: Border.all(color: Colors.grey),
+              showBackView: isCvvFocused,
+              obscureCardNumber: true,
+              obscureCardCvv: true,
+              isHolderNameVisible: true,
+              cardBgColor: MhColors.mhBlueLight,
+              isSwipeGestureEnabled: true,
+              onCreditCardWidgetChange: (CreditCardBrand creditCardBrand) {},
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    CreditCardForm(
+                      formKey: formKey,
+                      obscureCvv: true,
+                      obscureNumber: true,
+                      cardNumber: cardNumber,
+                      cvvCode: cvvCode,
+                      isHolderNameVisible: true,
+                      isCardNumberVisible: true,
+                      isExpiryDateVisible: true,
+                      cardHolderName: cardHolderName,
+                      expiryDate: expiryDate,
+                      inputConfiguration: const InputConfiguration(
+                        cardNumberDecoration: InputDecoration(
+                          labelText: 'Number',
+                          hintText: 'XXXX XXXX XXXX XXXX',
+                        ),
+                        expiryDateDecoration: InputDecoration(
+                          labelText: 'Expired Date',
+                          hintText: 'XX/XX',
+                        ),
+                        cvvCodeDecoration: InputDecoration(
+                          labelText: 'CVV',
+                          hintText: 'XXX',
+                        ),
+                        cardHolderDecoration: InputDecoration(
+                          labelText: 'Card Holder',
+                        ),
+                      ),
+                      onCreditCardModelChange: onCreditCardModelChange,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: MhMargins.mhStandardPadding,
+                          horizontal: MhMargins.standardPadding),
+                      child: MhButton(
+                        text: 'Validate',
+                        onTap: () async {
+                          if (formKey.currentState!.validate()) {
+                            formKey.currentState!.save();
+                            final String docId = generateRandomDocumentId();
+
+                            CreditCard creditCard = CreditCard(
+                                id: docId,
+                                cardNumber: cardNumber,
+                                expiryDate: expiryDate,
+                                cardHolderName: cardHolderName,
+                                cvvCode: cvvCode,
+                                isPrimary: false,
+                                userId: AuthenticationService.currentUser!.uid);
+
+                            await _createCreditCard(creditCard: creditCard);
+                            await CloudFirestoreHelper.updatePrimaryCreditCard(creditCard);
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        viButtonStyle: MhOutlinedButton(),
+                        height: MhMargins.mhButtonMediumHeight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
-  }
-
-  void _onValidate() {
-    if (formKey.currentState?.validate() ?? false) {
-      print('valid!');
-    } else {
-      print('invalid!');
-    }
-  }
-
-  Glassmorphism? _getGlassmorphismConfig() {
-    if (!useGlassMorphism) {
-      return null;
-    }
-
-    final LinearGradient gradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: <Color>[Colors.grey.withAlpha(50), Colors.grey.withAlpha(50)],
-      stops: const <double>[0.3, 0],
-    );
-
-    return isLightTheme
-        ? Glassmorphism(blurX: 8.0, blurY: 16.0, gradient: gradient)
-        : Glassmorphism.defaultConfig();
   }
 
   void onCreditCardModelChange(CreditCardModel creditCardModel) {
@@ -165,4 +147,25 @@ class CardValidationPageState extends State<CardValidationPage> {
       isCvvFocused = creditCardModel.isCvvFocused;
     });
   }
+
+  Future<void> _createCreditCard({required CreditCard creditCard}) async {
+    final docCreditCards =
+        FirebaseFirestore.instance.collection('CreditCards').doc(creditCard.id);
+
+    final creditCardJson = creditCard.toJson();
+    await docCreditCards.set(creditCardJson);
+  }
+
+  String generateRandomDocumentId() {
+    CollectionReference collection =
+        FirebaseFirestore.instance.collection('CreditCards');
+
+    DocumentReference newDocRef = collection.doc();
+
+    String newDocId = newDocRef.id;
+
+    return newDocId;
+  }
+
+
 }

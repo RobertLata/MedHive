@@ -4,7 +4,7 @@ import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
 import 'package:medhive/helpers/cloud_firestore_helper.dart';
 import 'package:medhive/pages/login_page.dart';
-import 'package:medhive/pages/setup_location_file.dart';
+import 'package:medhive/pages/setup_location_page.dart';
 import 'package:medhive/repositories/firebase_repository.dart';
 import 'package:medhive/services/authentication_service.dart';
 import 'package:medhive/widgets/mh_account_tile.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/entities/private_user.dart';
-import 'package:medhive/pages/setup_location_file.dart';
+import 'package:medhive/pages/setup_location_page.dart';
 import 'package:medhive/services/authentication_service.dart';
 
 import '../constants/mh_colors.dart';

@@ -187,7 +187,7 @@ class _SetupLocationPageState extends State<SetupLocationPage> {
 
                   await _createAddress(address: address);
 
-                  _updatePrimaryAddress(address);
+                  await _updatePrimaryAddress(address);
                   Navigator.of(context).pop();
                 }
               },
