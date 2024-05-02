@@ -19,14 +19,14 @@ class MedicineNotifier extends StateNotifier<MedicineState> {
   void removeMedicineFromList(Medicine medicineToRemove) {
     final newStateList = state.medicines;
     newStateList.removeWhere((medicine) =>
-    medicine.medicineName == medicineToRemove.medicineName);
+    medicine.name == medicineToRemove.name);
     state = state.copyWith(medicineList: newStateList);
   }
 
   void removeOneMedicineFromList(Medicine medicineToRemove) {
     final newStateList = state.medicines;
     int index = newStateList.indexWhere((medicine) =>
-    medicine.medicineName == medicineToRemove.medicineName);
+    medicine.name == medicineToRemove.name);
     if (index != -1) {
       newStateList.removeAt(index);
     }
@@ -49,7 +49,7 @@ class MedicineState {
   int getMedicineDose(Medicine medicine) {
     int medicineLength = 0;
     for (int i = 0; i < medicines.length; i++) {
-      if (medicines[i].medicineName == medicine.medicineName) {
+      if (medicines[i].name == medicine.name) {
         medicineLength++;
       }
     }

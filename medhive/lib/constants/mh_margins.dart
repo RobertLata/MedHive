@@ -10,6 +10,7 @@ class MhMargins {
 
   static const double mhTextFieldBorderRadius = 35;
   static const double mediumMargin = 16;
+  static const double mediumSmallMargin = 10;
   static const double smallMargin = 8;
 
   static const double extraSmallMargin = 3;

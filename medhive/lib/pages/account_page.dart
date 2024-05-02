@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/mh_margins.dart';
@@ -108,13 +109,16 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                 )
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: MhMargins.smallMargin),
-                              child: Text(
-                                'Hello, ${currentUser!.username ?? currentUser.name ?? "there"}!',
-                                style: MhTextStyle.heading1Style
-                                    .copyWith(color: MhColors.mhBlueRegular),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: MhMargins.smallMargin),
+                                child: Text(
+                                  'Hello, ${currentUser!.username ?? currentUser.name ?? "there"}!',
+                                  style: MhTextStyle.heading1Style
+                                      .copyWith(color: MhColors.mhBlueRegular),
+                                  maxLines: 2,
+                                ),
                               ),
                             )
                           ],
@@ -157,7 +161,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                  const CreditCardsPage()));
+                                      const CreditCardsPage()));
                             },
                             icon: Icons.credit_card_outlined),
                       ),
