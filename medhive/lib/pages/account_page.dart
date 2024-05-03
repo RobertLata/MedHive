@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/mh_margins.dart';
@@ -101,7 +100,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                             ),
                                           ],
                                         ),
-                                        child: Icon(
+                                        child: const Icon(
                                           Icons.edit,
                                           color: MhColors.mhBlueLight,
                                         ),
@@ -264,7 +263,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
       builder: (BuildContext bc) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            return Container(
+            return SizedBox(
               height: 250,
               child: Column(
                 children: <Widget>[

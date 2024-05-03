@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
+import 'package:medhive/pages/mh_pharmacy_details_page.dart';
 import 'package:medhive/widgets/mh_pharmacy_tile.dart';
 
 import '../entities/medicine.dart';
@@ -49,6 +50,14 @@ class PharmacyLists extends StatelessWidget {
                             horizontal: MhMargins.mediumSmallMargin),
                         child: MhPharmacyTile(
                             pharmacy: pharmacies[index],
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => MhPharmacyDetails(
+                                        pharmacy: pharmacies[index],
+                                        hasSpecialOffer:
+                                            _hasSpecialOffer(pharmacies[index]),
+                                      )));
+                            },
                             hasSpecialOffers:
                                 _hasSpecialOffer(pharmacies[index])),
                       );
@@ -84,6 +93,13 @@ class PharmacyLists extends StatelessWidget {
                             horizontal: MhMargins.mediumSmallMargin),
                         child: MhPharmacyTile(
                             pharmacy: pharmaciesWithDiscount[index],
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => MhPharmacyDetails(
+                                        pharmacy: pharmaciesWithDiscount[index],
+                                        hasSpecialOffer: true,
+                                      )));
+                            },
                             hasSpecialOffers: true),
                       );
                     },
@@ -112,7 +128,7 @@ class PharmacyLists extends StatelessWidget {
   bool _hasSpecialOffer(Pharmacy pharmacy) {
     List<Medicine> medicines = pharmacy.medicines;
     for (int i = 0; i < medicines.length; i++) {
-      if (medicines[i].isSpecialOffer == true) {
+      if (medicines[i].price != medicines[i].priceBeforeDiscount) {
         return true;
       }
     }

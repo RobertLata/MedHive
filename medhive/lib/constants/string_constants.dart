@@ -14,7 +14,7 @@ const String TERMS_AND_CONDITIONS_AGREEMENT = "Please agree to the Terms of Serv
 const String SUCCESSFUL_LOGIN = "Log in successfully";
 const String HOME_TEXT = "Home";
 const String DISCOVER_TEXT = "Discover";
-const String SHOPPING_CART = "Shopping cart";
+const String SHOPPING_BASKET = "Shopping basket";
 const String ORDERS_TEXT = "Orders";
 const String ACCOUNT_TEXT = "Account";
 

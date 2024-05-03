@@ -6,10 +6,10 @@ class Medicine {
   final String manufacturer;
   final String expiryDate;
   final String image;
-  final bool isSpecialOffer;
   final double price;
   final double priceBeforeDiscount;
   final int quantity;
+  final bool needsPrescription;
 
   Medicine({
     required this.id,
@@ -19,10 +19,10 @@ class Medicine {
     required this.manufacturer,
     required this.expiryDate,
     required this.image,
-    required this.isSpecialOffer,
     required this.price,
     required this.quantity,
     required this.priceBeforeDiscount,
+    required this.needsPrescription,
   });
 
   Map<String, dynamic> toJson() {
@@ -34,10 +34,10 @@ class Medicine {
       'manufacturer': manufacturer,
       'expiryDate': expiryDate,
       'image': image,
-      'isSpecialOffer': isSpecialOffer,
       'price': price,
       'quantity': quantity,
       'priceBeforeDiscount': priceBeforeDiscount,
+      'needsPrescription': needsPrescription,
     };
   }
 
@@ -50,10 +50,27 @@ class Medicine {
       manufacturer: json['manufacturer'],
       expiryDate: json['expiryDate'],
       image: json['image'],
-      isSpecialOffer: json['isSpecialOffer'],
       price: json['price'],
       quantity: json['quantity'],
       priceBeforeDiscount: json['priceBeforeDiscount'],
+      needsPrescription: json['needsPrescription'],
+    );
+  }
+  Medicine copyWith({
+    double? price,
+  }) {
+    return Medicine(
+      id: id,
+      name: name,
+      dosage: dosage,
+      type: type,
+      manufacturer: manufacturer,
+      expiryDate: expiryDate,
+      image: image,
+      price: price ?? this.price,
+      priceBeforeDiscount: priceBeforeDiscount,
+      quantity: quantity,
+      needsPrescription: needsPrescription,
     );
   }
 }

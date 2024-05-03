@@ -11,8 +11,12 @@ import 'custom_fade_in.dart';
 class MhPharmacyTile extends StatelessWidget {
   final Pharmacy pharmacy;
   final bool hasSpecialOffers;
+  final VoidCallback onTap;
   const MhPharmacyTile(
-      {super.key, required this.pharmacy, required this.hasSpecialOffers});
+      {super.key,
+      required this.pharmacy,
+      required this.hasSpecialOffers,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,7 @@ class MhPharmacyTile extends StatelessWidget {
       curve: Curves.easeIn,
       child: InkWell(
         borderRadius: BorderRadius.circular(MhMargins.standardPadding),
-        onTap: () {},
+        onTap: onTap,
         child: SizedBox(
           width: 300,
           child: Column(

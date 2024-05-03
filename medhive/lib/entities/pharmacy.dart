@@ -8,6 +8,7 @@ class Pharmacy {
   final double deliveryCost;
   final double rating;
   final int reviewCount;
+  final String deliveryTime;
   final List<Medicine> medicines;
 
   Pharmacy({
@@ -18,6 +19,7 @@ class Pharmacy {
     required this.deliveryCost,
     required this.rating,
     required this.reviewCount,
+    required this.deliveryTime,
     required this.medicines,
   });
 
@@ -30,6 +32,7 @@ class Pharmacy {
       'deliveryCont': deliveryCost,
       'rating': rating,
       'reviewCount': reviewCount,
+      'deliveryTime': deliveryTime,
       'medicines': medicines.map((medicine) => medicine.toJson()).toList(),
     };
   }
@@ -43,6 +46,7 @@ class Pharmacy {
       deliveryCost: json['deliveryCost'],
       rating: json['rating'],
       reviewCount: json['reviewCount'],
+      deliveryTime: json['deliveryTime'],
       medicines: (json['medicines'] as List<dynamic>)
           .map((medicineJson) => Medicine.fromJson(medicineJson))
           .toList(),

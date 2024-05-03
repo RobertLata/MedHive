@@ -9,6 +9,7 @@ class MhButton extends StatelessWidget {
   final bool disabled;
   final MhButtonStyle buttonStyle;
   final double? height;
+  final double? width;
   final void Function()? onTap;
 
   MhButton(
@@ -16,6 +17,7 @@ class MhButton extends StatelessWidget {
         required this.text,
         this.disabled = false,
         this.height = MhMargins.mhButtonDefaultHeight,
+        this.width,
         this.onTap,
         MhButtonStyle? viButtonStyle})
       : buttonStyle = viButtonStyle ?? MhFilledButton();
@@ -25,6 +27,7 @@ class MhButton extends StatelessWidget {
     required this.text,
     this.disabled = false,
     this.height = MhMargins.mhButtonDefaultHeight,
+    this.width,
     this.onTap,
   })  : buttonStyle = MhOutlinedButton();
 
@@ -33,6 +36,7 @@ class MhButton extends StatelessWidget {
     required this.text,
     this.disabled = false,
     this.height = MhMargins.mhButtonDefaultHeight,
+    this.width,
     this.onTap,
   })  : buttonStyle = MhGradientButton();
 
@@ -53,7 +57,7 @@ class MhButton extends StatelessWidget {
       child: Ink(
         decoration: buttonStyle.backgroundStyle(),
         child: Container(
-          width: MediaQuery.of(context).size.width,
+          width: width ?? MediaQuery.of(context).size.width,
           height: height,
           alignment: Alignment.center,
           child: Text(

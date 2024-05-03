@@ -25,7 +25,7 @@ class _BottomNavigationTabsState extends ConsumerState<BottomNavigationTabs> {
   @override
   Widget build(BuildContext context) {
     final tabState = ref.watch(tabIndexProvider);
-    //final medicineState = ref.watch(medicineListProvider);
+    final medicineState = ref.watch(medicineListProvider);
     return Material(
       elevation: 10.0,
       child: Container(
@@ -59,21 +59,22 @@ class _BottomNavigationTabsState extends ConsumerState<BottomNavigationTabs> {
                   text: DISCOVER_TEXT,
                 ),
                 GButton(
-                  icon: LineIcons.shoppingCart,
-                  text: SHOPPING_CART,
-                  // leading: medicineState.medicines.isEmpty
-                  //     ? null
-                  //     : Badge(
-                  //   backgroundColor: MhColors.mhBlueDark,
-                  //   label: Text(
-                  //     medicineState.medicines.length.toString(),
-                  //     style: const TextStyle(color: MhColors.mhBlueLight),
-                  //   ),
-                  //   child: const Icon(
-                  //     LineIcons.shoppingCart,
-                  //     size: MhMargins.iconsSize,
-                  //   ),
-                  // ),
+                  icon: LineIcons.shoppingBasket,
+                  text: SHOPPING_BASKET,
+                  leading: medicineState.medicines.isEmpty
+                      ? null
+                      : Badge(
+                    backgroundColor: MhColors.mhBlueDark,
+                    label: Text(
+                      medicineState.medicines.length.toString(),
+                      style: const TextStyle(color: MhColors.mhWhite),
+                    ),
+                    child: const Icon(
+                      LineIcons.shoppingBasket,
+                      size: MhMargins.iconsSize,
+                      color: MhColors.mhBlueDark,
+                    ),
+                  ),
                 ),
                 const GButton(
                   icon: LineIcons.list,

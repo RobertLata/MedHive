@@ -32,7 +32,6 @@ class OrderTile extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(MhMargins.mhStandardBorderRadius),
-        side: const BorderSide(color: MhColors.mhBlueLight),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,

@@ -53,21 +53,24 @@ class _HomePageState extends ConsumerState<HomePage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Icon(Icons.location_on, color: MhColors.mhPurple, size: 20,),
-                            const SizedBox(width: MhMargins.extraSmallMargin,),
-                            InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => SetupLocationPage(
-                                            onAddressChanged: () {
-                                              setState(() {});
-                                            },
-                                          )));
-                                },
-                                child: Text(
-                                  currentUser?.selectedAddress ?? 'Select Address',
-                                  style: MhTextStyle.bodyRegularStyle
-                                      .copyWith(color: MhColors.mhPurple),
-                                )),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: MhMargins.extraSmallMargin),
+                              child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => SetupLocationPage(
+                                              onAddressChanged: () {
+                                                setState(() {});
+                                              },
+                                            )));
+                                  },
+                                  child: Text(
+                                    currentUser?.selectedAddress ?? 'Select Address',
+                                    style: MhTextStyle.bodyRegularStyle
+                                        .copyWith(color: MhColors.mhPurple),
+                                  )),
+                            ),
+                            const Icon(Icons.keyboard_arrow_down, color: MhColors.mhBlueLight,),
                           ],
                         ),
                       ),
