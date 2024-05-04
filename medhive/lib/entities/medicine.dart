@@ -56,21 +56,4 @@ class Medicine {
       needsPrescription: json['needsPrescription'],
     );
   }
-  Medicine copyWith({
-    double? price,
-  }) {
-    return Medicine(
-      id: id,
-      name: name,
-      dosage: dosage,
-      type: type,
-      manufacturer: manufacturer,
-      expiryDate: expiryDate,
-      image: image,
-      price: price ?? this.price,
-      priceBeforeDiscount: priceBeforeDiscount,
-      quantity: quantity,
-      needsPrescription: needsPrescription,
-    );
-  }
 }

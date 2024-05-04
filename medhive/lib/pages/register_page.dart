@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/string_constants.dart';
 import 'package:medhive/helpers/useful_information_helper.dart';
+import 'package:medhive/pages/initial_page_decider.dart';
 import 'package:medhive/pages/tab_decider.dart';
 import 'package:medhive/services/authentication_service.dart';
 
@@ -269,7 +270,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       AuthenticationResponseEnum authResponse, BuildContext context) async {
     if (authResponse == AuthenticationResponseEnum.authSuccess) {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const TabDecider()),
+          MaterialPageRoute(builder: (context) => const InitialPageDecider()),
           (route) => false);
       await CloudFirestoreHelper.updatePrivateUserAvatar(
           'assets/images/male_avatar.png');

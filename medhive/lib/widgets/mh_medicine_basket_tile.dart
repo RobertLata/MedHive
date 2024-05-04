@@ -10,7 +10,11 @@ import '../entities/medicine.dart';
 
 class MhMedicineBasketTile extends ConsumerStatefulWidget {
   final Medicine medicine;
-  const MhMedicineBasketTile({super.key, required this.medicine});
+  final bool isFromPrescriptionPage;
+  const MhMedicineBasketTile(
+      {super.key,
+      required this.medicine,
+      required this.isFromPrescriptionPage});
 
   @override
   ConsumerState<MhMedicineBasketTile> createState() => _MedicineCardState();
@@ -18,7 +22,6 @@ class MhMedicineBasketTile extends ConsumerStatefulWidget {
 
 class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
   bool _didRemoveCard = false;
-  //late double _medicinePrice = widget.medicine.price;
   @override
   Widget build(BuildContext context) {
     final medicineState = ref.watch(medicineListProvider);
@@ -79,6 +82,9 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                             ref
                                 .read(medicineListProvider.notifier)
                                 .removeMedicineFromList(widget.medicine);
+                            if (widget.isFromPrescriptionPage) {
+                              Navigator.pop(context);
+                            }
                           },
                           child: Padding(
                             padding: const EdgeInsets.only(
@@ -99,27 +105,29 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                       children: [
                         Row(
                           children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                if (medicineState
-                                        .getMedicineDose(widget.medicine) >
-                                    0) {
-                                  ref
-                                      .read(medicineListProvider.notifier)
-                                      .removeOneMedicineFromList(
-                                          widget.medicine);
-                                  //_medicinePrice -= widget.medicine.price;
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: const CircleBorder(),
-                                backgroundColor: MhColors.mhBlueLight,
-                                elevation: 0,
-                                padding: const EdgeInsets.all(0),
-                              ),
-                              child: const Icon(
-                                LineIcons.minus,
-                                color: MhColors.mhBlueDark,
+                            Visibility(
+                              visible: !widget.isFromPrescriptionPage,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (medicineState
+                                          .getMedicineDose(widget.medicine) >
+                                      0) {
+                                    ref
+                                        .read(medicineListProvider.notifier)
+                                        .removeOneMedicineFromList(
+                                            widget.medicine);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: const CircleBorder(),
+                                  backgroundColor: MhColors.mhBlueLight,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.all(0),
+                                ),
+                                child: const Icon(
+                                  LineIcons.minus,
+                                  color: MhColors.mhBlueDark,
+                                ),
                               ),
                             ),
                             Text(
@@ -129,34 +137,30 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                               style: MhTextStyle.bodyRegularStyle
                                   .copyWith(color: MhColors.mhDarkGrey),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                ref
-                                    .read(medicineListProvider.notifier)
-                                    .addMedicineToList(widget.medicine);
-                                //_medicinePrice += widget.medicine.price;
-                                ref
-                                    .read(medicineListProvider.notifier)
-                                    .incrementMedicinePrice(
-                                        widget.medicine.name,
-                                        widget.medicine.price);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: const CircleBorder(),
-                                backgroundColor: MhColors.mhBlueLight,
-                                elevation: 0,
-                                padding: const EdgeInsets.all(0),
-                              ),
-                              child: const Icon(
-                                LineIcons.plus,
-                                color: MhColors.mhBlueDark,
+                            Visibility(
+                              visible: !widget.isFromPrescriptionPage,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  ref
+                                      .read(medicineListProvider.notifier)
+                                      .addMedicineToList(widget.medicine);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: const CircleBorder(),
+                                  backgroundColor: MhColors.mhBlueLight,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.all(0),
+                                ),
+                                child: const Icon(
+                                  LineIcons.plus,
+                                  color: MhColors.mhBlueDark,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         Text(
-                          //'$_medicinePrice lei',
-                          '${widget.medicine.price.toStringAsFixed(2)} lei',
+                          '${(widget.medicine.price * medicineState.getMedicineDose(widget.medicine)).toStringAsFixed(2)} lei',
                           style: MhTextStyle.bodyRegularStyle
                               .copyWith(color: MhColors.mhBlueRegular),
                         ),

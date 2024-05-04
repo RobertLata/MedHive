@@ -8,6 +8,8 @@ class UserOrder {
   List<dynamic> productQuantity;
   double totalPrice;
   String userId;
+  bool? isPrescriptionValid;
+  bool? wasDelivered;
 
   UserOrder({
     required this.id,
@@ -19,6 +21,8 @@ class UserOrder {
     required this.productQuantity,
     required this.totalPrice,
     required this.userId,
+    this.isPrescriptionValid,
+    this.wasDelivered,
   });
 
   factory UserOrder.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,8 @@ class UserOrder {
       productQuantity: json['productQuantity'] as List<dynamic>,
       totalPrice: json['totalPrice'] as double,
       userId: json['userId'] as String,
+      isPrescriptionValid: json['isPrescriptionValid'] as bool?,
+      wasDelivered: json['wasDelivered'] as bool?,
     );
   }
 
@@ -46,6 +52,8 @@ class UserOrder {
       'productQuantity': productQuantity,
       'totalPrice': totalPrice,
       'userId': userId,
+      'isPrescriptionValid': isPrescriptionValid,
+      'wasDelivered': wasDelivered,
     };
   }
 }

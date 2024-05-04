@@ -15,20 +15,6 @@ class MedicineNotifier extends StateNotifier<MedicineState> {
     state = state.copyWith(medicineList: newStateList);
   }
 
-  void incrementMedicinePrice(String medicineName, double increment) {
-    var newStateList = state.medicines;
-
-    int index =
-        newStateList.indexWhere((medicine) => medicine.name == medicineName);
-
-    if (index != -1) {
-      newStateList[index] = newStateList[index]
-          .copyWith(price: newStateList[index].price + increment);
-
-      state = state.copyWith(medicineList: newStateList);
-    }
-  }
-
   bool checkIfMedicineAlreadyExists(Medicine newMedicine) {
     return state.medicines.any((medicine) => medicine.name == newMedicine.name);
   }

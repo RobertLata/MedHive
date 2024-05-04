@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/string_constants.dart';
+import 'package:medhive/pages/initial_page_decider.dart';
 import 'package:medhive/pages/register_page.dart';
 import 'package:medhive/services/authentication_service.dart';
 import '../../../helpers/screen_size_helper.dart';
@@ -17,7 +18,6 @@ import '../widgets/mh_button.dart';
 import '../widgets/mh_snackbar.dart';
 import '../widgets/mh_text_form_field.dart';
 import '../widgets/provider_sign_in_button.dart';
-import 'tab_decider.dart';
 import 'forgot_password_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -234,7 +234,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ref.read(logInPageProvider);
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const TabDecider()),
+            MaterialPageRoute(builder: (context) => const InitialPageDecider()),
             (route) => false);
         showMhSnackbar(context, SUCCESSFUL_LOGIN,
             isError: false);

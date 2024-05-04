@@ -12,11 +12,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid) {
     await Firebase.initializeApp(
-      options: const FirebaseOptions(
-          apiKey: 'AIzaSyAMWs7i2AFDyaYUEbWTyjn3G7MXlLD34aA',
-          appId: '1:19106324265:android:df56dec4059961273e2138',
-          messagingSenderId: '19106324265',
-          projectId: 'medhive-da119'));
+        options: const FirebaseOptions(
+            apiKey: 'AIzaSyAMWs7i2AFDyaYUEbWTyjn3G7MXlLD34aA',
+            appId: '1:19106324265:android:df56dec4059961273e2138',
+            messagingSenderId: '19106324265',
+            projectId: 'medhive-da119',
+            storageBucket: 'medhive-da119.appspot.com'));
   } else {
     await Firebase.initializeApp();
   }

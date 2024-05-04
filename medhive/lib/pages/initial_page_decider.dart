@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medhive/pages/firebase_storage_file_page.dart';
 
 import '../controllers/authentication_controllers.dart';
 import 'tab_decider.dart';
@@ -16,9 +17,11 @@ class InitialPageDecider extends ConsumerWidget {
     return authState.when(
         data: (data) {
           if (data != null) {
-            // data contains all the user data
-            // Both data.email and authState.asData?.value?.email contain te user's email
-            return const TabDecider();
+            if (data.email == 'health.harmony@gmail.com') {
+              return const FirebaseStorageFilePage();
+            } else {
+              return const TabDecider();
+            }
           }
           return const LoginPage();
         },

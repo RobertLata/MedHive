@@ -1,19 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/entities/order.dart';
+import 'package:medhive/pages/tab_decider.dart';
 import 'package:medhive/widgets/mh_appbar_logo_right.dart';
 import 'package:medhive/widgets/mh_order_tile.dart';
 
 import '../constants/mh_colors.dart';
 import '../constants/mh_margins.dart';
 import '../constants/mh_style.dart';
+import '../controllers/tab_controller.dart';
 import '../services/authentication_service.dart';
+import '../widgets/mh_button.dart';
 
-class OrderPage extends StatelessWidget {
+class OrderPage extends ConsumerWidget {
   const OrderPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return StreamBuilder<List<UserOrder>>(
       stream: _readOrders(),
       builder: (context, snapshot) {
@@ -24,27 +28,63 @@ class OrderPage extends StatelessWidget {
               .toList();
           return Scaffold(
             appBar: AppBar(title: const MhAppBarLogoRight()),
-            body: ListView.builder(
-              itemCount: orders.isNotEmpty ? orders.length + 1 : 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.all(MhMargins.standardPadding),
-                    child: Text(
-                      "Your orders:",
-                      style: MhTextStyle.bodyRegularStyle
-                          .copyWith(color: MhColors.mhBlueRegular),
-                    ),
-                  );
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: MhMargins.extraSmallMargin,
-                      horizontal: MhMargins.smallMargin),
-                  child: buildAddress(orders[index - 1]),
-                );
-              },
-            ),
+            body: orders.every((order) => (order.wasDelivered == false))
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Make your first order',
+                        style: MhTextStyle.heading4Style
+                            .copyWith(color: MhColors.mhBlueLight),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 60,
+                            horizontal: MhMargins.mhStandardPadding),
+                        child: MhButton(
+                          text: 'Discover pharmacies',
+                          onTap: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => const TabDecider(
+                                          initialIndex: 1,
+                                        )),
+                                (route) => false);
+                            ref.read(tabIndexProvider.notifier).selectTab(1);
+                          },
+                        ),
+                      ),
+                    ],
+                  )
+                : ListView.builder(
+                    itemCount: orders.isNotEmpty ? orders.length + 1 : 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Padding(
+                          padding:
+                              const EdgeInsets.all(MhMargins.standardPadding),
+                          child: Text(
+                            "Your orders:",
+                            style: MhTextStyle.bodyRegularStyle
+                                .copyWith(color: MhColors.mhBlueRegular),
+                          ),
+                        );
+                      }
+                      int adjustedIndex = index - 1;
+                      return Visibility(
+                        visible: (orders[adjustedIndex].isPrescriptionValid ==
+                                true &&
+                            orders[adjustedIndex].wasDelivered == true),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: MhMargins.extraSmallMargin,
+                              horizontal: MhMargins.smallMargin),
+                          child: buildAddress(orders[adjustedIndex]),
+                        ),
+                      );
+                    },
+                  ),
           );
         } else if (snapshot.hasError) {
           return const Scaffold(body: Center(child: Text("Error")));
@@ -74,6 +114,5 @@ class OrderPage extends StatelessWidget {
       location: order.location,
       products: order.products,
       productQuantity: order.productQuantity,
-      totalPrice: order.totalPrice,
-      onTap: () {});
+      totalPrice: order.totalPrice);
 }
