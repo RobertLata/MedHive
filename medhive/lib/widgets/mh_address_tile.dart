@@ -7,26 +7,37 @@ class AddressTile extends StatelessWidget {
   final String addressStreet;
   final String addressLocation;
   final bool isPrimary;
-  final VoidCallback onTap;
-  final VoidCallback onCloseTap;
+  final VoidCallback? onTap;
+  final VoidCallback? onCloseTap;
+  final Color? color;
+  final Color? shadowColor;
+  final Color? surfaceTintColor;
 
-  const AddressTile({
-    super.key,
-    required this.addressName,
-    required this.addressStreet,
-    required this.addressLocation,
-    required this.isPrimary,
-    required this.onTap,
-    required this.onCloseTap,
-  });
+  const AddressTile(
+      {super.key,
+      required this.addressName,
+      required this.addressStreet,
+      required this.addressLocation,
+      required this.isPrimary,
+      this.onTap,
+      this.onCloseTap,
+      this.color,
+      this.shadowColor,
+      this.surfaceTintColor});
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: color != null ? 0 : 1,
+      color: color,
+      shadowColor: shadowColor,
+      surfaceTintColor: surfaceTintColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(MhMargins.mhStandardBorderRadius),
-        side: BorderSide(
-            color: isPrimary ? MhColors.mhBlueLight : Colors.transparent),
+        side: onCloseTap != null
+            ? BorderSide(
+                color: isPrimary ? MhColors.mhBlueLight : Colors.transparent)
+            : BorderSide.none,
       ),
       child: ListTile(
         leading: Icon(isPrimary ? Icons.home : Icons.location_on,
@@ -36,11 +47,15 @@ class AddressTile extends StatelessWidget {
           style: TextStyle(color: isPrimary ? MhColors.mhBlueLight : null),
         ),
         subtitle: Text('$addressStreet, $addressLocation'),
-        trailing: IconButton(
-          icon: Icon(Icons.close,
-              color: isPrimary ? MhColors.mhBlueLight : MhColors.mhDarkGrey),
-          onPressed: onCloseTap,
-        ),
+        trailing: onCloseTap != null
+            ? IconButton(
+                icon: Icon(Icons.close,
+                    color:
+                        isPrimary ? MhColors.mhBlueLight : MhColors.mhDarkGrey),
+                onPressed: onCloseTap,
+              )
+            : const Icon(Icons.keyboard_arrow_down_outlined,
+                color: MhColors.mhBlueLight),
         onTap: onTap,
       ),
     );

@@ -5,14 +5,9 @@ import 'mh_colors.dart';
 
 //display type/heroes
 class MhTextStyle {
-  static const TextStyle heroRegular = TextStyle(
-    fontSize: 48,
-    fontWeight: FontWeight.w400,
-    letterSpacing: -0.5,
-  );
 
   static const TextStyle heroBold = TextStyle(
-    fontSize: 48,
+    fontSize: 22,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.5,
   );

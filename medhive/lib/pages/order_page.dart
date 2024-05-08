@@ -27,6 +27,7 @@ class OrderPage extends ConsumerWidget {
                   element.userId == AuthenticationService.currentUserId)
               .toList();
           return Scaffold(
+            backgroundColor: MhColors.mhWhite,
             appBar: AppBar(title: const MhAppBarLogoRight()),
             body: orders.every((order) => (order.wasDelivered == false))
                 ? Column(

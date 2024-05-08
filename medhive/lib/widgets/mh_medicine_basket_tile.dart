@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_style.dart';
+import 'package:medhive/widgets/mh_snackbar.dart';
 
 import '../constants/mh_margins.dart';
 import '../controllers/medicine_list_controller.dart';
@@ -10,11 +11,15 @@ import '../entities/medicine.dart';
 
 class MhMedicineBasketTile extends ConsumerStatefulWidget {
   final Medicine medicine;
-  final bool isFromPrescriptionPage;
+  final bool noEditOption;
+  final Function(int productQuantity)? productQuantity;
+  final Function(double price)? price;
   const MhMedicineBasketTile(
       {super.key,
       required this.medicine,
-      required this.isFromPrescriptionPage});
+      required this.noEditOption,
+      this.productQuantity,
+      this.price});
 
   @override
   ConsumerState<MhMedicineBasketTile> createState() => _MedicineCardState();
@@ -25,6 +30,15 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
   @override
   Widget build(BuildContext context) {
     final medicineState = ref.watch(medicineListProvider);
+    void updateQuantities() {
+      final dose = medicineState.getMedicineDose(widget.medicine);
+      if (widget.price != null) {
+        widget.price!(widget.medicine.price * dose);
+      }
+      if (widget.productQuantity != null) {
+        widget.productQuantity!(dose);
+      }
+    }
     return _didRemoveCard || medicineState.getMedicineDose(widget.medicine) == 0
         ? const SizedBox()
         : Padding(
@@ -74,25 +88,29 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                                 .copyWith(color: MhColors.mhPurple),
                           ),
                         ),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              _didRemoveCard = true;
-                            });
-                            ref
-                                .read(medicineListProvider.notifier)
-                                .removeMedicineFromList(widget.medicine);
-                            if (widget.isFromPrescriptionPage) {
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: MhMargins.mediumSmallMargin),
-                            child: Text(
-                              'Remove',
-                              style: MhTextStyle.bodySmallRegularStyle
-                                  .copyWith(color: MhColors.mhBlueLight),
+                        Visibility(
+                          visible: !widget.noEditOption,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _didRemoveCard = true;
+                              });
+                              ref
+                                  .read(medicineListProvider.notifier)
+                                  .removeMedicineFromList(widget.medicine);
+                              updateQuantities();
+                              if (widget.noEditOption) {
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: MhMargins.mediumSmallMargin),
+                              child: Text(
+                                'Remove',
+                                style: MhTextStyle.bodySmallRegularStyle
+                                    .copyWith(color: MhColors.mhBlueLight),
+                              ),
                             ),
                           ),
                         ),
@@ -106,7 +124,7 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                         Row(
                           children: [
                             Visibility(
-                              visible: !widget.isFromPrescriptionPage,
+                              visible: !widget.noEditOption,
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (medicineState
@@ -116,6 +134,7 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                                         .read(medicineListProvider.notifier)
                                         .removeOneMedicineFromList(
                                             widget.medicine);
+                                    updateQuantities();
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -138,12 +157,17 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                                   .copyWith(color: MhColors.mhDarkGrey),
                             ),
                             Visibility(
-                              visible: !widget.isFromPrescriptionPage,
+                              visible: !widget.noEditOption,
                               child: ElevatedButton(
                                 onPressed: () {
+                                  if (medicineState.getMedicineDose(widget.medicine) > widget.medicine.quantity) {
+                                    showMhSnackbar(context, 'There are no ${widget.medicine.name} left');
+                                    return;
+                                  }
                                   ref
                                       .read(medicineListProvider.notifier)
                                       .addMedicineToList(widget.medicine);
+                                  updateQuantities();
                                 },
                                 style: ElevatedButton.styleFrom(
                                   shape: const CircleBorder(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medhive/constants/string_constants.dart';
 
+import '../constants/mh_colors.dart';
 import '../constants/mh_style.dart';
 
 class ErrorPage extends StatelessWidget {
@@ -10,7 +11,7 @@ class ErrorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: MhColors.mhWhite,
         body: Center(
           child: Text(AUTH_ERROR_MESSAGE,
               style: MhTextStyle.heading4Style.copyWith(color: Colors.red)),

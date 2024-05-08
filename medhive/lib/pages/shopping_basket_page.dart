@@ -18,57 +18,76 @@ import '../entities/order.dart';
 import '../entities/pharmacy.dart';
 import 'mh_finish_order_page.dart';
 
-class ShoppingBasketPage extends ConsumerWidget {
+class ShoppingBasketPage extends ConsumerStatefulWidget {
   const ShoppingBasketPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShoppingBasketPage> createState() => _ShoppingBasketPageState();
+}
+
+class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
+  late List<int> productsQuantity;
+  late List<double> medicinePrices;
+  late double totalPrice;
+
+  @override
+  void initState() {
+    super.initState();
+    productsQuantity = [];
+    medicinePrices = [];
+    totalPrice = 0.0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final medicineState = ref.watch(medicineListProvider);
     final medicinesWithNoDuplicates = medicineState.medicines.toSet().toList();
+
+    if (productsQuantity.isEmpty && medicinesWithNoDuplicates.isNotEmpty) {
+      productsQuantity = List<int>.filled(medicinesWithNoDuplicates.length, 1, growable: true);
+      for (int i = 0; i < medicinesWithNoDuplicates.length; i++) {
+        medicinePrices.add(medicinesWithNoDuplicates[i].price);
+      }
+    }
+
     return StreamBuilder<List<Pharmacy>>(
         stream: _readPharmacies(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
+              backgroundColor: MhColors.mhWhite,
               bottomNavigationBar: medicineState.medicines.isEmpty
                   ? const SizedBox()
                   : InkWell(
                       onTap: () async {
                         final pharmacies = snapshot.data!;
-                        String pharmacyName = pharmacies
+                        Pharmacy pharmacy = pharmacies
                             .where((element) =>
                                 element.id == medicinesWithNoDuplicates[0].id)
-                            .first
-                            .name;
-                        String pharmacyLogo = pharmacies
-                            .where((element) =>
-                                element.id == medicinesWithNoDuplicates[0].id)
-                            .first
-                            .logo;
-                        String location = pharmacies
-                            .where((element) =>
-                                element.id == medicinesWithNoDuplicates[0].id)
-                            .first
-                            .address;
+                            .first;
                         List<Medicine> medicinesFromPharmacy = pharmacies
                             .where((element) =>
                                 element.id == medicinesWithNoDuplicates[0].id)
                             .first
                             .medicines;
                         List<dynamic> products = [];
-                        for (int i = 0; i < medicinesFromPharmacy.length; i++) {
+                        totalPrice = 0.0;
+                        for (int i = 0; i < productsQuantity.length; i++) {
                           products.add(medicinesFromPharmacy[i].name);
+                        }
+                        for (int i = 0; i < productsQuantity.length; i++) {
+                          totalPrice += medicinePrices[i];
                         }
                         final String docId = generateRandomDocumentId();
                         UserOrder order = UserOrder(
                             id: docId,
-                            pharmacyName: pharmacyName,
-                            pharmacyLogo: pharmacyLogo,
+                            pharmacyName: pharmacy.name,
+                            pharmacyLogo: pharmacy.logo,
                             deliveryDate: '',
-                            location: location,
+                            location: pharmacy.address,
                             products: products,
-                            productQuantity: [2, 3],
-                            totalPrice: 120.5,
+                            productQuantity: productsQuantity,
+                            totalPrice: totalPrice,
                             userId: AuthenticationService.currentUserId!,
                             isPrescriptionValid: false,
                             wasDelivered: false);
@@ -88,10 +107,17 @@ class ShoppingBasketPage extends ConsumerWidget {
                                     medicineThatRequirePrescription:
                                         medicinesThatRequirePrescription,
                                     order: order,
+                                    pharmacy: pharmacy,
+                                    totalPrice: totalPrice,
+                                orderId: docId,
                                   )));
                         } else {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => MhFinishOrderPage()));
+                              builder: (context) => MhFinishOrderPage(
+                                    totalPrice: totalPrice,
+                                    pharmacy: pharmacy,
+                                orderId: docId,
+                              )));
                         }
                       },
                       child: Container(
@@ -171,7 +197,14 @@ class ShoppingBasketPage extends ConsumerWidget {
                             itemBuilder: (context, index) =>
                                 MhMedicineBasketTile(
                               medicine: medicinesWithNoDuplicates[index],
-                              isFromPrescriptionPage: false,
+                              noEditOption: false,
+                              productQuantity: (productQuantity) {
+                                productsQuantity[index] = productQuantity;
+                                productsQuantity.removeWhere((element) => element == 0);
+                              },
+                              price: (price) {
+                                medicinePrices[index] = price;
+                              },
                             ),
                           ),
                         ),

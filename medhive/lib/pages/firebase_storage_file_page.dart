@@ -32,9 +32,13 @@ class _FirebaseStorageFilePageState
 
   Future<List<Map<String, dynamic>>> listFiles() async {
     List<Map<String, dynamic>> files = [];
+    String pharmacyName =
+        AuthenticationService.currentUserEmail == 'health.harmony@gmail.com'
+            ? 'Health Harmony'
+            : '';
 
     final ListResult result =
-        await FirebaseStorage.instance.ref('uploads').listAll();
+        await FirebaseStorage.instance.ref(pharmacyName).listAll();
 
     for (var file in result.items) {
       String url = await file.getDownloadURL();
@@ -56,6 +60,7 @@ class _FirebaseStorageFilePageState
           if (snapshot.hasData) {
             List<UserOrder> orders = snapshot.data!;
             return Scaffold(
+              backgroundColor: MhColors.mhWhite,
               appBar: AppBar(
                 title: const Text("Uploaded Files"),
               ),

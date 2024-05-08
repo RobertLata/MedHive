@@ -38,6 +38,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             } else {
               final currentUser = snapshot.data;
               return Scaffold(
+                backgroundColor: MhColors.mhWhite,
                 appBar: const MhAppBarLogoRight(),
                 body: SingleChildScrollView(
                   child: Column(
