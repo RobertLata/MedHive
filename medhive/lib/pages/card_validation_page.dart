@@ -121,6 +121,7 @@ class CardValidationPageState extends State<CardValidationPage> {
 
                             await _createCreditCard(creditCard: creditCard);
                             await CloudFirestoreHelper.updatePrimaryCreditCard(creditCard);
+                            await _updatePrivateUserBankAccount();
                             Navigator.of(context).pop();
                           }
                         },
@@ -167,5 +168,11 @@ class CardValidationPageState extends State<CardValidationPage> {
     return newDocId;
   }
 
+  Future<void> _updatePrivateUserBankAccount() async {
+    final collection = FirebaseFirestore.instance.collection('PrivateUsers');
 
+    final docRef = collection.doc(AuthenticationService.currentUserId);
+
+    await docRef.update({'bankAccount': 1500.50});
+  }
 }

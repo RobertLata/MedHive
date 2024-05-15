@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:medhive/entities/address.dart';
 import 'package:medhive/entities/order.dart';
+import 'package:medhive/entities/private_user.dart';
 import 'package:medhive/pages/setup_location_page.dart';
 import 'package:medhive/services/authentication_service.dart';
 import 'package:medhive/widgets/mh_address_tile.dart';
@@ -15,8 +17,10 @@ import '../constants/mh_margins.dart';
 import '../constants/mh_style.dart';
 import '../entities/medicine.dart';
 import '../entities/pharmacy.dart';
+import '../repositories/firebase_repository.dart';
+import 'order_state_page.dart';
 
-class MhFinishOrderPage extends StatelessWidget {
+class MhFinishOrderPage extends ConsumerStatefulWidget {
   final double totalPrice;
   final Pharmacy pharmacy;
   final String orderId;
@@ -26,6 +30,11 @@ class MhFinishOrderPage extends StatelessWidget {
       required this.pharmacy,
       required this.orderId});
 
+  @override
+  ConsumerState<MhFinishOrderPage> createState() => _MhFinishOrderPageState();
+}
+
+class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Address>>(
@@ -42,13 +51,14 @@ class MhFinishOrderPage extends StatelessWidget {
                 builder: (context, snapshot2) {
                   if (snapshot2.hasData) {
                     UserOrder order = snapshot2.data!
-                        .where((element) => element.id == orderId)
+                        .where((element) => element.id == widget.orderId)
                         .first;
                     List<Medicine> medicines = [];
-                    for (int i = 0; i < pharmacy.medicines.length; i++) {
+                    for (int i = 0; i < widget.pharmacy.medicines.length; i++) {
                       for (int j = 0; j < order.products.length; j++) {
-                        if (pharmacy.medicines[i].name == order.products[j]) {
-                          medicines.add(pharmacy.medicines[i]);
+                        if (widget.pharmacy.medicines[i].name ==
+                            order.products[j]) {
+                          medicines.add(widget.pharmacy.medicines[i]);
                         }
                       }
                     }
@@ -58,6 +68,14 @@ class MhFinishOrderPage extends StatelessWidget {
                         title: const Text('Finish Order'),
                       ),
                       bottomNavigationBar: InkWell(
+                        onTap: () async {
+                          final firebaseController =
+                              ref.watch(firestoreRepositoryProvider);
+                          final currentUser =
+                              await firebaseController.readPrivateUser(
+                                  AuthenticationService.currentUserId);
+                          _showProcessingDialog(context, currentUser);
+                        },
                         child: Container(
                           height: 70,
                           width: double.infinity,
@@ -79,7 +97,7 @@ class MhFinishOrderPage extends StatelessWidget {
                                           .copyWith(color: MhColors.mhWhite),
                                     ),
                                     Text(
-                                      '${(totalPrice + pharmacy.deliveryCost).toStringAsFixed(2)} lei',
+                                      '${(widget.totalPrice + widget.pharmacy.deliveryCost).toStringAsFixed(2)} lei',
                                       style: MhTextStyle.bodyRegularStyle
                                           .copyWith(color: MhColors.mhWhite),
                                     ),
@@ -227,18 +245,19 @@ class MhFinishOrderPage extends StatelessWidget {
                                   ),
                                   OrderSummaryTile(
                                       text: 'Products',
-                                      price: totalPrice.toStringAsFixed(2)),
+                                      price:
+                                          widget.totalPrice.toStringAsFixed(2)),
                                   OrderSummaryTile(
                                       text: 'Delivery',
-                                      price: pharmacy.deliveryCost
+                                      price: widget.pharmacy.deliveryCost
                                           .toStringAsFixed(2)),
                                   OrderSummaryTile(
                                       text: 'Total',
                                       textStyle: MhTextStyle.heroBold
                                           .copyWith(color: MhColors.mhBlueDark),
-                                      price:
-                                          (totalPrice + pharmacy.deliveryCost)
-                                              .toStringAsFixed(2)),
+                                      price: (widget.totalPrice +
+                                              widget.pharmacy.deliveryCost)
+                                          .toStringAsFixed(2)),
                                 ],
                               ),
                             )
@@ -279,4 +298,93 @@ class MhFinishOrderPage extends StatelessWidget {
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Address.fromJson(doc.data())).toList());
+
+  Future<void> _updatePrivateUserBankAccount(
+      double? currentBankAccount, double priceToPay) async {
+    final collection = FirebaseFirestore.instance.collection('PrivateUsers');
+
+    final docRef = collection.doc(AuthenticationService.currentUserId);
+
+    await docRef
+        .update({'bankAccount': (currentBankAccount ?? 0) - priceToPay});
+  }
+
+  void _showProcessingDialog(BuildContext context, PrivateUser? currentUser) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        bool success = false;
+        bool insufficientFunds = false;
+
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            Future.delayed(const Duration(seconds: 3), () {
+              if ((currentUser?.bankAccount ?? 0) >
+                  widget.totalPrice + widget.pharmacy.deliveryCost) {
+                setState(() {
+                  success = true;
+                });
+                Future.delayed(const Duration(seconds: 3), () async {
+                  await _updatePrivateUserBankAccount(currentUser?.bankAccount,
+                      widget.totalPrice + widget.pharmacy.deliveryCost);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => OrderStatePage(
+                              pharmacy: widget.pharmacy,
+                              orderId: widget.orderId,
+                            )),
+                  );
+                });
+              } else {
+                setState(() {
+                  insufficientFunds = true;
+                });
+                Future.delayed(const Duration(seconds: 3), () {
+                  Navigator.of(context).pop();
+                });
+              }
+            });
+            return AlertDialog(
+              title: Text(
+                'Payment Validation',
+                style: MhTextStyle.heading4Style
+                    .copyWith(color: MhColors.mhPurple),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Your request is being processed.",
+                    style: MhTextStyle.bodyRegularStyle
+                        .copyWith(color: MhColors.mhBlueLight),
+                  ),
+                  const SizedBox(height: MhMargins.standardPadding),
+                  if (success)
+                    const Icon(Icons.check_circle,
+                        color: MhColors.mhGreen, size: 48),
+                  if (insufficientFunds)
+                    Column(
+                      children: [
+                        const Icon(Icons.cancel,
+                            color: MhColors.mhErrorRed, size: 48),
+                        Text(
+                          'Insufficient funds',
+                          style: MhTextStyle.bodyRegularStyle.copyWith(
+                            color: MhColors.mhErrorRed,
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (!success && !insufficientFunds)
+                    const CircularProgressIndicator(),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }

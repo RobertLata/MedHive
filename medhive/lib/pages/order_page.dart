@@ -29,7 +29,7 @@ class OrderPage extends ConsumerWidget {
           return Scaffold(
             backgroundColor: MhColors.mhWhite,
             appBar: AppBar(title: const MhAppBarLogoRight()),
-            body: orders.every((order) => (order.wasDelivered == false))
+            body: orders.every((order) => (order.orderState == 'In Progress'))
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -49,10 +49,10 @@ class OrderPage extends ConsumerWidget {
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => const TabDecider(
-                                          initialIndex: 1,
+                                          initialIndex: 0,
                                         )),
                                 (route) => false);
-                            ref.read(tabIndexProvider.notifier).selectTab(1);
+                            ref.read(tabIndexProvider.notifier).selectTab(0);
                           },
                         ),
                       ),
@@ -74,9 +74,9 @@ class OrderPage extends ConsumerWidget {
                       }
                       int adjustedIndex = index - 1;
                       return Visibility(
-                        visible: (orders[adjustedIndex].isPrescriptionValid ==
-                                true &&
-                            orders[adjustedIndex].wasDelivered == true),
+                        visible: orders[adjustedIndex].orderState ==
+                                'Delivered' ||
+                            orders[adjustedIndex].orderState == 'In Delivery',
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: MhMargins.extraSmallMargin,
@@ -113,6 +113,7 @@ class OrderPage extends ConsumerWidget {
       pharmacyLogo: order.pharmacyLogo,
       deliveryDate: order.deliveryDate,
       location: order.location,
+      deliveryState: order.orderState,
       products: order.products,
       productQuantity: order.productQuantity,
       totalPrice: order.totalPrice);

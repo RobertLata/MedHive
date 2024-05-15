@@ -43,13 +43,6 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
     final medicineState = ref.watch(medicineListProvider);
     final medicinesWithNoDuplicates = medicineState.medicines.toSet().toList();
 
-    if (productsQuantity.isEmpty && medicinesWithNoDuplicates.isNotEmpty) {
-      productsQuantity = List<int>.filled(medicinesWithNoDuplicates.length, 1, growable: true);
-      for (int i = 0; i < medicinesWithNoDuplicates.length; i++) {
-        medicinePrices.add(medicinesWithNoDuplicates[i].price);
-      }
-    }
-
     return StreamBuilder<List<Pharmacy>>(
         stream: _readPharmacies(),
         builder: (context, snapshot) {
@@ -72,11 +65,22 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                             .medicines;
                         List<dynamic> products = [];
                         totalPrice = 0.0;
+                        productsQuantity = [];
+
+                        Map<String, int> lastMedicineQuantities = {};
+
+                        for (Medicine medicine in medicineState.medicines) {
+                          lastMedicineQuantities[medicine.name] =
+                              medicineState.getMedicineDose(medicine);
+                        }
+                        lastMedicineQuantities.forEach((name, quantity) {
+                          productsQuantity.add(quantity);
+                        });
+                        medicineState.medicines.forEach((medicine) {
+                          totalPrice += medicine.price;
+                        });
                         for (int i = 0; i < productsQuantity.length; i++) {
                           products.add(medicinesFromPharmacy[i].name);
-                        }
-                        for (int i = 0; i < productsQuantity.length; i++) {
-                          totalPrice += medicinePrices[i];
                         }
                         final String docId = generateRandomDocumentId();
                         UserOrder order = UserOrder(
@@ -90,7 +94,7 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                             totalPrice: totalPrice,
                             userId: AuthenticationService.currentUserId!,
                             isPrescriptionValid: false,
-                            wasDelivered: false);
+                            orderState: 'In Progress');
                         await _createOrder(order: order);
                         List<Medicine> medicinesThatRequirePrescription = [];
                         for (int i = 0;
@@ -109,15 +113,15 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                                     order: order,
                                     pharmacy: pharmacy,
                                     totalPrice: totalPrice,
-                                orderId: docId,
+                                    orderId: docId,
                                   )));
                         } else {
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => MhFinishOrderPage(
                                     totalPrice: totalPrice,
                                     pharmacy: pharmacy,
-                                orderId: docId,
-                              )));
+                                    orderId: docId,
+                                  )));
                         }
                       },
                       child: Container(
@@ -198,13 +202,6 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                                 MhMedicineBasketTile(
                               medicine: medicinesWithNoDuplicates[index],
                               noEditOption: false,
-                              productQuantity: (productQuantity) {
-                                productsQuantity[index] = productQuantity;
-                                productsQuantity.removeWhere((element) => element == 0);
-                              },
-                              price: (price) {
-                                medicinePrices[index] = price;
-                              },
                             ),
                           ),
                         ),

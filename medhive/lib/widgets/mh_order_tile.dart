@@ -4,6 +4,7 @@ import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
 import 'package:medhive/pages/mh_pharmacy_details_page.dart';
+import 'package:medhive/pages/order_state_page.dart';
 
 import '../entities/medicine.dart';
 import '../entities/pharmacy.dart';
@@ -14,6 +15,7 @@ class OrderTile extends StatelessWidget {
   final String pharmacyLogo;
   final String deliveryDate;
   final String location;
+  final String? deliveryState;
   final List<dynamic> products;
   final List<dynamic> productQuantity;
   final double totalPrice;
@@ -25,6 +27,7 @@ class OrderTile extends StatelessWidget {
     required this.pharmacyLogo,
     required this.deliveryDate,
     required this.location,
+    this.deliveryState,
     required this.products,
     required this.productQuantity,
     required this.totalPrice,
@@ -76,7 +79,7 @@ class OrderTile extends StatelessWidget {
                                 .copyWith(color: MhColors.mhBlueRegular),
                           ),
                           Text(
-                            'Order delivered in $deliveryDate at $location',
+                            deliveryState == 'In Progress' ? 'Order: $id' : deliveryState == 'In Delivery' ? 'Order: $id is in delivery' : 'Order delivered in $deliveryDate at $location',
                             style: MhTextStyle.bodyRegularStyle
                                 .copyWith(color: MhColors.mhBlueRegular),
                           ),
@@ -124,24 +127,40 @@ class OrderTile extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '$totalPrice lei',
+                                '${totalPrice.toStringAsFixed(2)} lei',
                                 style: MhTextStyle.heading4Style
                                     .copyWith(color: MhColors.mhBlueRegular),
                               ),
                               InkWell(
                                 onTap: () {
-                                  Pharmacy pharmacy = pharmacies
-                                      .where((element) =>
-                                          element.name == pharmacyName)
-                                      .first;
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => MhPharmacyDetails(
-                                          pharmacy: pharmacy,
-                                          hasSpecialOffer:
-                                              _hasSpecialOffer(pharmacy))));
+                                  if (deliveryState == 'In Progress') {
+                                    _handOrder(id);
+                                  } else if (deliveryState == 'In Delivery') {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                OrderStatePage(orderId: id)));
+                                  } else {
+                                    Pharmacy pharmacy = pharmacies
+                                        .where((element) =>
+                                            element.name == pharmacyName)
+                                        .first;
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                MhPharmacyDetails(
+                                                    pharmacy: pharmacy,
+                                                    hasSpecialOffer:
+                                                        _hasSpecialOffer(
+                                                            pharmacy))));
+                                  }
                                 },
                                 child: Text(
-                                  'See partner',
+                                  deliveryState == 'In Progress'
+                                      ? 'Hand order' :
+                                  deliveryState == 'In Delivery'
+                                      ? 'See details'
+                                      : 'See partner',
                                   style: MhTextStyle.heading4Style
                                       .copyWith(color: MhColors.mhPurple),
                                 ),
@@ -181,5 +200,16 @@ class OrderTile extends StatelessWidget {
       }
     }
     return false;
+  }
+
+
+
+  Future<void> _handOrder(String orderId) async {
+    final docOrders =
+    FirebaseFirestore.instance.collection('Orders').doc(orderId);
+
+    await docOrders.update({
+      'orderState': 'In Delivery',
+    });
   }
 }

@@ -10,6 +10,7 @@ class Medicine {
   final double priceBeforeDiscount;
   final int quantity;
   final bool needsPrescription;
+  final String? sideEffects;
 
   Medicine({
     required this.id,
@@ -23,6 +24,7 @@ class Medicine {
     required this.quantity,
     required this.priceBeforeDiscount,
     required this.needsPrescription,
+    this.sideEffects,
   });
 
   Map<String, dynamic> toJson() {
@@ -38,6 +40,7 @@ class Medicine {
       'quantity': quantity,
       'priceBeforeDiscount': priceBeforeDiscount,
       'needsPrescription': needsPrescription,
+      'sideEffects': sideEffects,
     };
   }
 
@@ -54,6 +57,7 @@ class Medicine {
       quantity: json['quantity'],
       priceBeforeDiscount: json['priceBeforeDiscount'],
       needsPrescription: json['needsPrescription'],
+      sideEffects: json['sideEffects'],
     );
   }
 }

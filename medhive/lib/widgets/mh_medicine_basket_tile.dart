@@ -12,14 +12,12 @@ import '../entities/medicine.dart';
 class MhMedicineBasketTile extends ConsumerStatefulWidget {
   final Medicine medicine;
   final bool noEditOption;
-  final Function(int productQuantity)? productQuantity;
-  final Function(double price)? price;
+
   const MhMedicineBasketTile(
       {super.key,
       required this.medicine,
       required this.noEditOption,
-      this.productQuantity,
-      this.price});
+      });
 
   @override
   ConsumerState<MhMedicineBasketTile> createState() => _MedicineCardState();
@@ -30,15 +28,7 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
   @override
   Widget build(BuildContext context) {
     final medicineState = ref.watch(medicineListProvider);
-    void updateQuantities() {
-      final dose = medicineState.getMedicineDose(widget.medicine);
-      if (widget.price != null) {
-        widget.price!(widget.medicine.price * dose);
-      }
-      if (widget.productQuantity != null) {
-        widget.productQuantity!(dose);
-      }
-    }
+
     return _didRemoveCard || medicineState.getMedicineDose(widget.medicine) == 0
         ? const SizedBox()
         : Padding(
@@ -98,7 +88,6 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                               ref
                                   .read(medicineListProvider.notifier)
                                   .removeMedicineFromList(widget.medicine);
-                              updateQuantities();
                               if (widget.noEditOption) {
                                 Navigator.pop(context);
                               }
@@ -134,7 +123,6 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                                         .read(medicineListProvider.notifier)
                                         .removeOneMedicineFromList(
                                             widget.medicine);
-                                    updateQuantities();
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -167,7 +155,6 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                                   ref
                                       .read(medicineListProvider.notifier)
                                       .addMedicineToList(widget.medicine);
-                                  updateQuantities();
                                 },
                                 style: ElevatedButton.styleFrom(
                                   shape: const CircleBorder(),

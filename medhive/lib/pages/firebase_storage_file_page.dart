@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/helpers/url_helper.dart';
 import 'package:medhive/widgets/mh_button.dart';
+import 'package:medhive/widgets/mh_order_tile.dart';
 
 import '../constants/mh_colors.dart';
+import '../constants/mh_margins.dart';
 import '../constants/mh_style.dart';
 import '../entities/order.dart';
 import '../repositories/firebase_repository.dart';
@@ -66,6 +68,12 @@ class _FirebaseStorageFilePageState
               ),
               body: Column(
                 children: [
+                  ...orders.map((order) => order.orderState == 'In Progress' ? Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: MhMargins.mediumSmallMargin,
+                        horizontal: MhMargins.standardPadding),
+                    child: OrderTile(id: order.id, pharmacyName: order.pharmacyName, pharmacyLogo: order.pharmacyLogo, deliveryDate: order.deliveryDate, location: order.location, products: order.products, productQuantity: order.productQuantity, totalPrice: order.totalPrice, deliveryState: order.orderState,),
+                  ) : const SizedBox()),
                   FutureBuilder<List<Map<String, dynamic>>>(
                     future: _fileList,
                     builder: (BuildContext context,

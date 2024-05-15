@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_style.dart';
 import 'package:medhive/entities/medicine.dart';
+import 'package:medhive/helpers/url_helper.dart';
 import 'package:medhive/pages/tab_decider.dart';
 import 'package:medhive/widgets/mh_snackbar.dart';
 
@@ -41,19 +42,32 @@ class MhMedicineTile extends ConsumerWidget {
                         .copyWith(color: MhColors.mhBlueLight),
                   ),
                   Text(
-                    'dosage: ${medicine.dosage}',
+                    'Dosage: ${medicine.dosage}',
                     style: MhTextStyle.bodyRegularStyle
                         .copyWith(color: MhColors.mhPurple),
                   ),
                   Text(
-                    'type: ${medicine.type}',
+                    'Type: ${medicine.type}',
                     style: MhTextStyle.bodyRegularStyle
                         .copyWith(color: MhColors.mhPurple),
                   ),
                   Text(
-                    'expires in: ${medicine.expiryDate}',
+                    'Expires in: ${medicine.expiryDate}',
                     style: MhTextStyle.bodyRegularStyle
                         .copyWith(color: MhColors.mhPurple),
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      if (medicine.sideEffects != null) {
+                        Uri url = Uri.parse(medicine.sideEffects!);
+                        await UrlHelper.launchURLBrowser(url);
+                      }
+                    },
+                    child: Text(
+                      'Side effects',
+                      style: MhTextStyle.bodyRegularStyle
+                          .copyWith(color: MhColors.mhErrorRed),
+                    ),
                   ),
                   medicine.needsPrescription
                       ? Row(
@@ -63,7 +77,7 @@ class MhMedicineTile extends ConsumerWidget {
                             const Icon(
                               Icons.featured_play_list_outlined,
                               size: 22,
-                              color: MhColors.mhPurple,
+                              color: MhColors.mhGreen,
                             ),
                             const SizedBox(
                               width: MhMargins.extraSmallMargin,
@@ -73,7 +87,7 @@ class MhMedicineTile extends ConsumerWidget {
                               child: Text(
                                 'Needs medical prescription',
                                 style: MhTextStyle.bodyRegularStyle
-                                    .copyWith(color: MhColors.mhPurple),
+                                    .copyWith(color: MhColors.mhGreen),
                               ),
                             ),
                           ],
@@ -140,6 +154,9 @@ class MhMedicineTile extends ConsumerWidget {
                       width: 100,
                     ),
                   ),
+                  SizedBox(
+                    height: MhMargins.mediumSmallMargin,
+                  ),
                   Padding(
                     padding:
                         const EdgeInsets.only(top: MhMargins.standardPadding),
@@ -151,23 +168,24 @@ class MhMedicineTile extends ConsumerWidget {
                         if (ref
                             .read(medicineListProvider.notifier)
                             .checkIfMedicineIsFromSamePharmacy(medicine)) {
-                          if(ref
-                              .read(medicineListProvider.notifier)
-                              .checkIfMedicineAlreadyExists(medicine) == false) {
+                          if (ref
+                                  .read(medicineListProvider.notifier)
+                                  .checkIfMedicineAlreadyExists(medicine) ==
+                              false) {
                             ref
                                 .read(medicineListProvider.notifier)
                                 .addMedicineToList(medicine);
                             showMhSnackbar(context,
                                 'Product added successfully. See your basket',
                                 isError: false, onTap: () {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) => const TabDecider(
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => const TabDecider(
                                             initialIndex: 2,
                                           )),
-                                          (route) => false);
-                                  ref.read(tabIndexProvider.notifier).selectTab(2);
-                                });
+                                  (route) => false);
+                              ref.read(tabIndexProvider.notifier).selectTab(2);
+                            });
                           } else {
                             showMhSnackbar(context,
                                 'This product is already in your basket');

@@ -206,7 +206,6 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      // User must not close the dialog by tapping outside of it
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
@@ -221,7 +220,7 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
                 style: MhTextStyle.bodyRegularStyle
                     .copyWith(color: MhColors.mhBlueLight),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: MhMargins.standardPadding),
               const CircularProgressIndicator(),
             ],
           ),
@@ -229,7 +228,6 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
       },
     );
 
-    // Listen to changes only after the dialog is shown
     orderSubscription = FirebaseFirestore.instance
         .collection('Orders')
         .doc(widget.order.id)
