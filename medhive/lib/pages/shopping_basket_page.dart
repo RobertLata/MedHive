@@ -171,10 +171,10 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (context) => const TabDecider(
-                                            initialIndex: 1,
+                                            initialIndex: 0,
                                           )),
                                   (route) => false);
-                              ref.read(tabIndexProvider.notifier).selectTab(1);
+                              ref.read(tabIndexProvider.notifier).selectTab(0);
                             },
                           ),
                         ),

@@ -181,10 +181,10 @@ class MhMedicineTile extends ConsumerWidget {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (context) => const TabDecider(
-                                            initialIndex: 2,
+                                            initialIndex: 1,
                                           )),
                                   (route) => false);
-                              ref.read(tabIndexProvider.notifier).selectTab(2);
+                              ref.read(tabIndexProvider.notifier).selectTab(1);
                             });
                           } else {
                             showMhSnackbar(context,

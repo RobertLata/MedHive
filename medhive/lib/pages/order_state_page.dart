@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
@@ -8,11 +9,13 @@ import 'package:medhive/entities/order.dart';
 import 'package:medhive/entities/pharmacy.dart';
 import 'package:medhive/pages/rider_location_page.dart';
 import 'package:medhive/pages/tab_decider.dart';
+import 'package:medhive/widgets/comment_section.dart';
 import 'package:medhive/widgets/mh_appbar_logo_right.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../controllers/medicine_list_controller.dart';
 import '../controllers/tab_controller.dart';
+import '../widgets/rating_feedback.dart';
 
 class OrderStatePage extends ConsumerStatefulWidget {
   final Pharmacy? pharmacy;
@@ -25,6 +28,7 @@ class OrderStatePage extends ConsumerStatefulWidget {
 
 class _OrderStatePageState extends ConsumerState<OrderStatePage> {
   late Pharmacy? pharmacy = widget.pharmacy;
+  double ratingValue = 3.0;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -52,6 +56,7 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
                 .where((element) => element.id == widget.orderId)
                 .first;
             return Scaffold(
+              resizeToAvoidBottomInset: false,
               backgroundColor: MhColors.mhWhite,
               appBar: MhAppBarLogoRight(
                 isBackVisible: true,
@@ -73,47 +78,120 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
               body: Padding(
                 padding: const EdgeInsets.all(MhMargins.standardPadding),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     order.orderState == 'In Progress'
-                        ? Text(
-                            'The order: ${order.id} is in progress.\nAs soon as we finish packing it a rider will pick it up.',
-                            style: MhTextStyle.bodyRegularStyle
-                                .copyWith(color: MhColors.mhBlueRegular),
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Your order: ${order.id} is in progress.',
+                                style: MhTextStyle.heading4Style
+                                    .copyWith(color: MhColors.mhBlueRegular),
+                              ),
+                              Text(
+                                'As soon as we finish packing it a rider will pick it up.',
+                                style: MhTextStyle.bodyRegularStyle
+                                    .copyWith(color: MhColors.mhBlueLight),
+                              ),
+                              Lottie.asset(
+                                'lotties/medicine_packing.json',
+                                width: 300,
+                                height: 300,
+                                fit: BoxFit.contain,
+                              ),
+                            ],
                           )
                         : order.orderState == 'In Delivery'
                             ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'Your order will be delivered soon',
-                                    style: MhTextStyle.bodyRegularStyle
-                                        .copyWith(
-                                            color: MhColors.mhBlueRegular),
+                                    'Your order: ${order.id} will be delivered soon',
+                                    style: MhTextStyle.heading4Style.copyWith(
+                                        color: MhColors.mhBlueRegular),
                                   ),
                                   InkWell(
                                     onTap: () {
                                       Navigator.of(context)
                                           .push(MaterialPageRoute(
                                               builder: (context) => MapPage(
-                                                    deliveryAddress: LatLng(
-                                                        45.7409, 21.2007),
+                                                    deliveryAddress:
+                                                        const LatLng(
+                                                            45.7409, 21.2007),
                                                   )));
                                     },
-                                    child: Text(
-                                      'See on map',
-                                      style: MhTextStyle.bodySmallRegularStyle
-                                          .copyWith(color: MhColors.mhPurple),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: MhMargins.standardPadding),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.location_on,
+                                            color: MhColors.mhPurple,
+                                          ),
+                                          Text(
+                                            'See on map',
+                                            style: MhTextStyle
+                                                .bodySmallRegularStyle
+                                                .copyWith(
+                                                    color: MhColors.mhPurple),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  )
+                                  ),
+                                  Lottie.asset(
+                                    'lotties/in_delivery.json',
+                                    width: 300,
+                                    height: 300,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ],
                               )
                             : order.orderState == 'Delivered'
-                                ? Text(
-                                    'The order: ${order.id} has been delivered successfully.',
-                                    style: MhTextStyle.bodyRegularStyle
-                                        .copyWith(
-                                            color: MhColors.mhBlueRegular),
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Your order: ${order.id} has been delivered successfully.',
+                                        style: MhTextStyle.heading4Style
+                                            .copyWith(
+                                                color: MhColors.mhBlueRegular),
+                                      ),
+                                      Lottie.asset(
+                                        'lotties/order_delivered.json',
+                                        width: 300,
+                                        height: 300,
+                                        fit: BoxFit.contain,
+                                      ),
+                                      Text(
+                                        'Rate products and delivery',
+                                        style: MhTextStyle.bodyRegularStyle
+                                            .copyWith(
+                                                color: MhColors.mhBlueLight),
+                                      ),
+                                      RatingFeedback(
+                                        ratingValue: (double returnedValue) {
+                                          setState(() {
+                                            ratingValue = returnedValue;
+                                          });
+                                        },
+                                      ),
+                                      CommentSection(
+                                        pharmacy: pharmacy,
+                                        rating: ratingValue,
+                                      ),
+                                    ],
                                   )
                                 : const SizedBox(),
                   ],

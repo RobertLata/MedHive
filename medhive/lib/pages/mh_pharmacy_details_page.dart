@@ -103,7 +103,7 @@ class _MhPharmacyDetailsState extends State<MhPharmacyDetails> {
                       Row(
                         children: [
                           Text(
-                            widget.pharmacy.rating.toString(),
+                            widget.pharmacy.rating.toStringAsFixed(1),
                             style: MhTextStyle.bodyRegularStyle
                                 .copyWith(color: Colors.black),
                           ),

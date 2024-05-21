@@ -66,112 +66,141 @@ class _FirebaseStorageFilePageState
               appBar: AppBar(
                 title: const Text("Uploaded Files"),
               ),
-              body: Column(
-                children: [
-                  ...orders.map((order) => order.orderState == 'In Progress' ? Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: MhMargins.mediumSmallMargin,
-                        horizontal: MhMargins.standardPadding),
-                    child: OrderTile(id: order.id, pharmacyName: order.pharmacyName, pharmacyLogo: order.pharmacyLogo, deliveryDate: order.deliveryDate, location: order.location, products: order.products, productQuantity: order.productQuantity, totalPrice: order.totalPrice, deliveryState: order.orderState,),
-                  ) : const SizedBox()),
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: _fileList,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasError) {
-                          return Text("Error: ${snapshot.error}");
-                        }
-
-                        return Expanded(
-                          child: ListView.builder(
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  ListTile(
-                                    title: Text(
-                                        'Order: ${snapshot.data![index]["name"]}'),
-                                    subtitle: InkWell(
-                                        onTap: () {
-                                          UrlHelper.launchURLBrowser(Uri.parse(
-                                              snapshot.data![index]["url"]));
-                                        },
-                                        child:
-                                            Text(snapshot.data![index]["url"])),
-                                  ),
-                                  MhButton(
-                                    text: 'Approve',
-                                    width: 180,
-                                    onTap: () async {
-                                      UserOrder orderToValidate = orders
-                                          .where((element) =>
-                                              element.id ==
-                                              snapshot.data![index]["name"])
-                                          .first;
-                                      await _validateOrder(orderToValidate);
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        );
-                      } else {
-                        return const CircularProgressIndicator();
-                      }
-                    },
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        await AuthenticationService().signOut();
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => const LoginPage()),
-                          (route) => false,
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 1.0),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero, // No border radius
-                        ),
-                      ),
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: MhMargins.standardPadding),
                       child: Text(
-                        'Sign out',
-                        style: MhTextStyle.bodyRegularStyle
-                            .copyWith(color: MhColors.mhErrorRed),
+                        'Orders In Progress',
+                        style: MhTextStyle.heading4Style
+                            .copyWith(color: MhColors.mhBlueLight),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        await firebaseController.deletePrivateUser();
-                        await AuthenticationService().deleteAccount();
-                        Navigator.of(context).pushAndRemoveUntil(
+                    ...orders.map((order) => order.orderState == 'In Progress'
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: MhMargins.mediumSmallMargin,
+                                horizontal: MhMargins.standardPadding),
+                            child: OrderTile(
+                              id: order.id,
+                              pharmacyName: order.pharmacyName,
+                              pharmacyLogo: order.pharmacyLogo,
+                              deliveryDate: order.deliveryDate,
+                              location: order.location,
+                              products: order.products,
+                              productQuantity: order.productQuantity,
+                              totalPrice: order.totalPrice,
+                              deliveryState: order.orderState,
+                            ),
+                          )
+                        : const SizedBox()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: MhMargins.standardPadding),
+                      child: Text(
+                        'Loaded Prescriptions',
+                        style: MhTextStyle.heading4Style
+                            .copyWith(color: MhColors.mhBlueLight),
+                      ),
+                    ),
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _fileList,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasError) {
+                            return Text("Error: ${snapshot.error}");
+                          }
+                          return Column(
+                            children: [
+                              ...snapshot.data!.map((file) => Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text('Order: ${file["name"]}'),
+                                        subtitle: InkWell(
+                                          onTap: () {
+                                            UrlHelper.launchURLBrowser(
+                                                Uri.parse(file["url"]));
+                                          },
+                                          child: Text(file["url"]),
+                                        ),
+                                      ),
+                                      MhButton(
+                                        text: 'Approve',
+                                        width: 180,
+                                        onTap: () async {
+                                          UserOrder orderToValidate =
+                                              orders.firstWhere((element) =>
+                                                  element.id == file["name"]);
+                                          await _validateOrder(orderToValidate);
+                                        },
+                                      ),
+                                    ],
+                                  )),
+                            ],
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                    const SizedBox(
+                      height: MhMargins.mhStandardPadding,
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await AuthenticationService().signOut();
+                          Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
                                 builder: (context) => const LoginPage()),
-                            (route) => false);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
+                            (route) => false,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 1.0),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                          ),
+                        ),
+                        child: Text(
+                          'Sign out',
+                          style: MhTextStyle.bodyRegularStyle
+                              .copyWith(color: MhColors.mhErrorRed),
                         ),
                       ),
-                      child: Text(
-                        'Delete account',
-                        style: MhTextStyle.bodyRegularStyle
-                            .copyWith(color: MhColors.mhErrorRed),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await firebaseController.deletePrivateUser();
+                          await AuthenticationService().deleteAccount();
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
+                            (route) => false,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                          ),
+                        ),
+                        child: Text(
+                          'Delete account',
+                          style: MhTextStyle.bodyRegularStyle
+                              .copyWith(color: MhColors.mhErrorRed),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           } else if (snapshot.hasError) {

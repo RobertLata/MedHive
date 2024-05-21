@@ -23,14 +23,14 @@ class _TabDeciderState extends ConsumerState<TabDecider> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: widget.initialIndex ?? 0,
-      length: 5,
+      length: 4,
       child: const Scaffold(
         backgroundColor: MhColors.mhLightGrey,
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: [
             HomePage(),
-            DiscoverPage(),
+            //DiscoverPage(),
             ShoppingBasketPage(),
             OrderPage(),
             AccountPage(),

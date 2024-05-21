@@ -79,7 +79,11 @@ class OrderTile extends StatelessWidget {
                                 .copyWith(color: MhColors.mhBlueRegular),
                           ),
                           Text(
-                            deliveryState == 'In Progress' ? 'Order: $id' : deliveryState == 'In Delivery' ? 'Order: $id is in delivery' : 'Order delivered in $deliveryDate at $location',
+                            deliveryState == 'In Progress'
+                                ? 'Order: $id'
+                                : deliveryState == 'In Delivery'
+                                    ? 'Order: $id is in delivery'
+                                    : 'Order delivered in $deliveryDate at $location',
                             style: MhTextStyle.bodyRegularStyle
                                 .copyWith(color: MhColors.mhBlueRegular),
                           ),
@@ -134,7 +138,7 @@ class OrderTile extends StatelessWidget {
                               InkWell(
                                 onTap: () {
                                   if (deliveryState == 'In Progress') {
-                                    _handOrder(id);
+                                    _handOrder(id, pharmacyName);
                                   } else if (deliveryState == 'In Delivery') {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
@@ -157,10 +161,10 @@ class OrderTile extends StatelessWidget {
                                 },
                                 child: Text(
                                   deliveryState == 'In Progress'
-                                      ? 'Hand order' :
-                                  deliveryState == 'In Delivery'
-                                      ? 'See details'
-                                      : 'See partner',
+                                      ? 'Hand order'
+                                      : deliveryState == 'In Delivery'
+                                          ? 'See details'
+                                          : 'See partner',
                                   style: MhTextStyle.heading4Style
                                       .copyWith(color: MhColors.mhPurple),
                                 ),
@@ -202,14 +206,15 @@ class OrderTile extends StatelessWidget {
     return false;
   }
 
-
-
-  Future<void> _handOrder(String orderId) async {
+  Future<void> _handOrder(String orderId, String pharmacyName) async {
     final docOrders =
-    FirebaseFirestore.instance.collection('Orders').doc(orderId);
+        FirebaseFirestore.instance.collection('Orders').doc(orderId);
 
     await docOrders.update({
       'orderState': 'In Delivery',
+      'deliveryRiderId': pharmacyName == 'Health Harmony'
+          ? 'QbopXuLJiXcU1dWjEg2Ksrq6cTC3'
+          : '',
     });
   }
 }

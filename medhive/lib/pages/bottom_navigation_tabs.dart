@@ -33,7 +33,7 @@ class _BottomNavigationTabsState extends ConsumerState<BottomNavigationTabs> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: MhMargins.smallMargin,
+                horizontal: 40,
                 vertical: MhMargins.mediumMargin),
             child: GNav(
               rippleColor: MhColors.mhBlueLight,
@@ -54,10 +54,10 @@ class _BottomNavigationTabsState extends ConsumerState<BottomNavigationTabs> {
                   icon: LineIcons.home,
                   text: HOME_TEXT,
                 ),
-                const GButton(
-                  icon: LineIcons.search,
-                  text: DISCOVER_TEXT,
-                ),
+                // const GButton(
+                //   icon: LineIcons.search,
+                //   text: DISCOVER_TEXT,
+                // ),
                 GButton(
                   icon: LineIcons.shoppingBasket,
                   text: SHOPPING_BASKET,
