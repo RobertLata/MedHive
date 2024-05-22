@@ -103,7 +103,8 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                               productQuantity: productsQuantity,
                               totalPrice: totalPrice,
                               userId: AuthenticationService.currentUserId!,
-                              orderState: 'In Progress');
+                              orderState: 'In Progress',
+                              isOrderPayed: false);
                           await _createOrder(order: order);
                           Navigator.of(context).push(
                             PageRouteBuilder(
@@ -137,7 +138,8 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                               totalPrice: totalPrice,
                               userId: AuthenticationService.currentUserId!,
                               orderState: 'In Progress',
-                              isPrescriptionValid: true);
+                              isPrescriptionValid: true,
+                              isOrderPayed: false);
                           await _createOrder(order: order);
                           Navigator.of(context).push(
                             PageRouteBuilder(

@@ -74,7 +74,7 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
                           final currentUser =
                               await firebaseController.readPrivateUser(
                                   AuthenticationService.currentUserId);
-                          _showProcessingDialog(context, currentUser);
+                          _showProcessingDialog(context, currentUser, order.id);
                         },
                         child: Container(
                           height: 70,
@@ -149,11 +149,16 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
                                         onTap: () {
                                           Navigator.of(context).push(
                                             PageRouteBuilder(
-                                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                              const SetupLocationPage(),
-                                              transitionsBuilder:
-                                                  (context, animation, secondaryAnimation, child) {
-                                                return FadeTransition(opacity: animation, child: child);
+                                              pageBuilder: (context, animation,
+                                                      secondaryAnimation) =>
+                                                  const SetupLocationPage(),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                return FadeTransition(
+                                                    opacity: animation,
+                                                    child: child);
                                               },
                                             ),
                                           );
@@ -315,7 +320,16 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
         .update({'bankAccount': (currentBankAccount ?? 0) - priceToPay});
   }
 
-  void _showProcessingDialog(BuildContext context, PrivateUser? currentUser) {
+  Future<void> _updateOrderIsPayed(String orderId) async {
+    final collection = FirebaseFirestore.instance.collection('Orders');
+
+    final docRef = collection.doc(orderId);
+
+    await docRef.update({'isOrderPayed': true});
+  }
+
+  void _showProcessingDialog(
+      BuildContext context, PrivateUser? currentUser, String orderId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -334,6 +348,7 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
                 Future.delayed(const Duration(seconds: 3), () async {
                   await _updatePrivateUserBankAccount(currentUser?.bankAccount,
                       widget.totalPrice + widget.pharmacy.deliveryCost);
+                  await _updateOrderIsPayed(orderId);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

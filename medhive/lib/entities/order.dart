@@ -13,6 +13,7 @@ class UserOrder {
   String? deliveryRiderId;
   double? riderLat;
   double? riderLong;
+  bool isOrderPayed;
 
   UserOrder({
     required this.id,
@@ -29,6 +30,7 @@ class UserOrder {
     this.deliveryRiderId,
     this.riderLat,
     this.riderLong,
+    required this.isOrderPayed,
   });
 
   factory UserOrder.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,7 @@ class UserOrder {
       deliveryRiderId: json['deliveryRiderId'] as String?,
       riderLat: json['riderLat'] as double?,
       riderLong: json['riderLong'] as double?,
+      isOrderPayed: json['isOrderPayed'] as bool,
     );
   }
 
@@ -66,6 +69,7 @@ class UserOrder {
       'deliveryRiderId': deliveryRiderId,
       'riderLat': riderLat,
       'riderLong': riderLong,
+      'isOrderPayed': isOrderPayed,
     };
   }
 }

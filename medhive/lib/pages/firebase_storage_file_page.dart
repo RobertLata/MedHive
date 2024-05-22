@@ -80,7 +80,8 @@ class _FirebaseStorageFilePageState
                     ),
                     ...orders.map((order) =>
                         order.orderState == 'In Progress' &&
-                                order.isPrescriptionValid == true
+                                order.isPrescriptionValid == true &&
+                                order.isOrderPayed == true
                             ? Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: MhMargins.mediumSmallMargin,

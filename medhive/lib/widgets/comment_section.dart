@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
+import 'package:medhive/widgets/mh_snackbar.dart';
 
 import '../entities/pharmacy.dart';
 
@@ -74,5 +75,7 @@ class _CommentSectionState extends State<CommentSection> {
       'rating': currentRating,
       'reviewCount': numberOfReviews
     });
+    showMhSnackbar(context, 'Rating submitted successfully', isError: false);
+    Navigator.of(context).pop();
   }
 }
