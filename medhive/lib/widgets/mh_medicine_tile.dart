@@ -150,8 +150,8 @@ class MhMedicineTile extends ConsumerWidget {
                     padding: const EdgeInsets.all(MhMargins.standardPadding),
                     child: Image.asset(
                       medicine.image,
-                      height: 100,
-                      width: 100,
+                      height: 80,
+                      width: 80,
                     ),
                   ),
                   SizedBox(
@@ -162,7 +162,7 @@ class MhMedicineTile extends ConsumerWidget {
                         const EdgeInsets.only(top: MhMargins.standardPadding),
                     child: MhButton(
                       text: 'Add to basket',
-                      width: 150,
+                      width: 122,
                       height: 50,
                       onTap: () {
                         if (ref
@@ -178,12 +178,19 @@ class MhMedicineTile extends ConsumerWidget {
                             showMhSnackbar(context,
                                 'Product added successfully. See your basket',
                                 isError: false, onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) => const TabDecider(
-                                            initialIndex: 1,
-                                          )),
-                                  (route) => false);
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation, secondaryAnimation) =>
+                                      const TabDecider(
+                                        initialIndex: 1,
+                                      ),
+                                      transitionsBuilder:
+                                          (context, animation, secondaryAnimation, child) {
+                                        return FadeTransition(opacity: animation, child: child);
+                                      },
+                                    ),
+                                          (route) => false,
+                                  );
                               ref.read(tabIndexProvider.notifier).selectTab(1);
                             });
                           } else {

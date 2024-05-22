@@ -47,11 +47,20 @@ class OrderPage extends ConsumerWidget {
                           text: 'Discover pharmacies',
                           onTap: () {
                             Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const TabDecider(
-                                          initialIndex: 0,
-                                        )),
-                                (route) => false);
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                const TabDecider(
+                                  initialIndex: 0,
+                                ),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                              ),
+                                  (route) => false,
+                            );
                             ref.read(tabIndexProvider.notifier).selectTab(0);
                           },
                         ),

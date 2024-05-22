@@ -33,7 +33,7 @@ class _BottomNavigationTabsState extends ConsumerState<BottomNavigationTabs> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: 40,
+                horizontal: MhMargins.standardPadding,
                 vertical: MhMargins.mediumMargin),
             child: GNav(
               rippleColor: MhColors.mhBlueLight,

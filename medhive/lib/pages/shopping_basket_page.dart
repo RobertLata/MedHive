@@ -82,20 +82,6 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                         for (int i = 0; i < productsQuantity.length; i++) {
                           products.add(medicinesFromPharmacy[i].name);
                         }
-                        final String docId = generateRandomDocumentId();
-                        UserOrder order = UserOrder(
-                            id: docId,
-                            pharmacyName: pharmacy.name,
-                            pharmacyLogo: pharmacy.logo,
-                            deliveryDate: '',
-                            location: pharmacy.address,
-                            products: products,
-                            productQuantity: productsQuantity,
-                            totalPrice: totalPrice,
-                            userId: AuthenticationService.currentUserId!,
-                            isPrescriptionValid: false,
-                            orderState: 'In Progress');
-                        await _createOrder(order: order);
                         List<Medicine> medicinesThatRequirePrescription = [];
                         for (int i = 0;
                             i < medicinesWithNoDuplicates.length;
@@ -106,22 +92,69 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                           }
                         }
                         if (medicinesThatRequirePrescription.isNotEmpty) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => MhPrescriptionPage(
-                                    medicineThatRequirePrescription:
-                                        medicinesThatRequirePrescription,
-                                    order: order,
-                                    pharmacy: pharmacy,
-                                    totalPrice: totalPrice,
-                                    orderId: docId,
-                                  )));
+                          final String docId = generateRandomDocumentId();
+                          UserOrder order = UserOrder(
+                              id: docId,
+                              pharmacyName: pharmacy.name,
+                              pharmacyLogo: pharmacy.logo,
+                              deliveryDate: '',
+                              location: pharmacy.address,
+                              products: products,
+                              productQuantity: productsQuantity,
+                              totalPrice: totalPrice,
+                              userId: AuthenticationService.currentUserId!,
+                              orderState: 'In Progress');
+                          await _createOrder(order: order);
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      MhPrescriptionPage(
+                                medicineThatRequirePrescription:
+                                    medicinesThatRequirePrescription,
+                                order: order,
+                                pharmacy: pharmacy,
+                                totalPrice: totalPrice,
+                                orderId: docId,
+                              ),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                return FadeTransition(
+                                    opacity: animation, child: child);
+                              },
+                            ),
+                          );
                         } else {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => MhFinishOrderPage(
-                                    totalPrice: totalPrice,
-                                    pharmacy: pharmacy,
-                                    orderId: docId,
-                                  )));
+                          final String docId = generateRandomDocumentId();
+                          UserOrder order = UserOrder(
+                              id: docId,
+                              pharmacyName: pharmacy.name,
+                              pharmacyLogo: pharmacy.logo,
+                              deliveryDate: '',
+                              location: pharmacy.address,
+                              products: products,
+                              productQuantity: productsQuantity,
+                              totalPrice: totalPrice,
+                              userId: AuthenticationService.currentUserId!,
+                              orderState: 'In Progress',
+                              isPrescriptionValid: true);
+                          await _createOrder(order: order);
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      MhFinishOrderPage(
+                                totalPrice: totalPrice,
+                                pharmacy: pharmacy,
+                                orderId: docId,
+                              ),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                return FadeTransition(
+                                    opacity: animation, child: child);
+                              },
+                            ),
+                          );
                         }
                       },
                       child: Container(
@@ -169,11 +202,20 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
                             text: 'Start shopping',
                             onTap: () {
                               Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) => const TabDecider(
-                                            initialIndex: 0,
-                                          )),
-                                  (route) => false);
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const TabDecider(
+                                    initialIndex: 0,
+                                  ),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                        opacity: animation, child: child);
+                                  },
+                                ),
+                                (route) => false,
+                              );
                               ref.read(tabIndexProvider.notifier).selectTab(0);
                             },
                           ),

@@ -10,6 +10,7 @@ import '../constants/mh_colors.dart';
 import '../constants/mh_margins.dart';
 import '../constants/mh_style.dart';
 import '../entities/order.dart';
+import '../helpers/location_helper.dart';
 import '../repositories/firebase_repository.dart';
 import '../services/authentication_service.dart';
 import 'login_page.dart';
@@ -29,8 +30,9 @@ class RiderPage extends ConsumerWidget {
             if (orders != null && orders.isNotEmpty) {
               order = orders
                   .where((order) =>
-                      order?.deliveryRiderId ==
-                      AuthenticationService.currentUserId)
+                      (order?.deliveryRiderId ==
+                          AuthenticationService.currentUserId) &&
+                      order?.orderState == 'In Delivery')
                   .firstOrNull;
             }
             return order == null
@@ -53,9 +55,17 @@ class RiderPage extends ConsumerWidget {
                           onPressed: () async {
                             await AuthenticationService().signOut();
                             Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
-                              (route) => false,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                const LoginPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                              ),
+                                  (route) => false,
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -79,9 +89,18 @@ class RiderPage extends ConsumerWidget {
                             await firebaseController.deletePrivateUser();
                             await AuthenticationService().deleteAccount();
                             Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (route) => false);
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                const LoginPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                              ),
+                                  (route) => false,
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero,
@@ -113,14 +132,29 @@ class RiderPage extends ConsumerWidget {
                                 child: Column(
                                   children: [
                                     InkWell(
-                                      onTap: () {
-                                        Navigator.of(context)
-                                            .push(MaterialPageRoute(
-                                                builder: (context) => MapPage(
-                                                      deliveryAddress:
-                                                          const LatLng(
-                                                              45.7409, 21.2007),
-                                                    )));
+                                      onTap: () async {
+                                        final hasPermission =
+                                            await LocationHandler
+                                                .handleLocationPermission();
+                                        if (hasPermission) {
+                                          Navigator.of(context).push(
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation, secondaryAnimation) =>
+                                                  RiderLocationPage(
+                                                    deliveryAddress:
+                                                    const LatLng(
+                                                        45.7726717,
+                                                        21.2255738),
+                                                    orderId:
+                                                    order?.id ?? '',
+                                                  ),
+                                              transitionsBuilder:
+                                                  (context, animation, secondaryAnimation, child) {
+                                                return FadeTransition(opacity: animation, child: child);
+                                              },
+                                            ),
+                                          );
+                                        }
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -131,11 +165,12 @@ class RiderPage extends ConsumerWidget {
                                           const Icon(
                                             Icons.location_on,
                                             color: MhColors.mhPurple,
+                                            size: 30,
                                           ),
                                           Text(
                                             'See map',
                                             style: MhTextStyle
-                                                .bodySmallRegularStyle
+                                                .heading4Style
                                                 .copyWith(
                                                     color: MhColors.mhPurple),
                                           ),
@@ -167,18 +202,24 @@ class RiderPage extends ConsumerWidget {
                                 ),
                               )
                             : const SizedBox(),
-                        const SizedBox(
-                          height: MhMargins.mhStandardPadding,
-                        ),
+                        const Spacer(),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () async {
                               await AuthenticationService().signOut();
                               Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (route) => false,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) =>
+                                  const LoginPage(),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                        opacity: animation, child: child);
+                                  },
+                                ),
+                                    (route) => false,
                               );
                             },
                             style: ElevatedButton.styleFrom(
@@ -203,9 +244,18 @@ class RiderPage extends ConsumerWidget {
                               await firebaseController.deletePrivateUser();
                               await AuthenticationService().deleteAccount();
                               Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (context) => const LoginPage()),
-                                  (route) => false);
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) =>
+                                  const LoginPage(),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                        opacity: animation, child: child);
+                                  },
+                                ),
+                                    (route) => false,
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.zero,

@@ -148,9 +148,15 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
                                         surfaceTintColor: MhColors.mhWhite,
                                         onTap: () {
                                           Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const SetupLocationPage()));
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation, secondaryAnimation) =>
+                                              const SetupLocationPage(),
+                                              transitionsBuilder:
+                                                  (context, animation, secondaryAnimation, child) {
+                                                return FadeTransition(opacity: animation, child: child);
+                                              },
+                                            ),
+                                          );
                                         },
                                       ),
                                     ),

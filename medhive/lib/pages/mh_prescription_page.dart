@@ -77,12 +77,20 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
       bottomNavigationBar: InkWell(
         onTap: () {
           if (isPrescriptionValid == true) {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => MhFinishOrderPage(
-                      totalPrice: widget.totalPrice,
-                      pharmacy: widget.pharmacy,
-                      orderId: widget.orderId,
-                    )));
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    MhFinishOrderPage(
+                  totalPrice: widget.totalPrice,
+                  pharmacy: widget.pharmacy,
+                  orderId: widget.orderId,
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
           } else {
             _showProcessingDialog(context);
           }
@@ -137,7 +145,7 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
           Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: MhMargins.standardPadding),
-            child: Row(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 MhButton(
@@ -146,6 +154,15 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
                   onTap: () async {
                     await _scanPrescription();
                   },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: MhMargins.standardPadding),
+                  child: Text(
+                    'Or',
+                    style: MhTextStyle.bodyRegularStyle
+                        .copyWith(color: MhColors.mhBlueLight),
+                  ),
                 ),
                 MhButton(
                   text: 'Attach prescription',
@@ -242,12 +259,20 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
         }
         if (orderData.isPrescriptionValid == true) {
           Navigator.of(context).pop();
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => MhFinishOrderPage(
-                    totalPrice: widget.totalPrice,
-                    pharmacy: widget.pharmacy,
-                    orderId: widget.orderId,
-                  )));
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  MhFinishOrderPage(
+                totalPrice: widget.totalPrice,
+                pharmacy: widget.pharmacy,
+                orderId: widget.orderId,
+              ),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+            ),
+          );
         }
       }
     });

@@ -99,7 +99,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void _popCurrentPage() {
     //Used pushReplacement instead of pop to reset the validators when we go back to login page
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginPage()));
+      PageRouteBuilder(
+        pageBuilder:
+            (context, animation, secondaryAnimation) =>
+        const LoginPage(),
+        transitionsBuilder: (context, animation,
+            secondaryAnimation, child) {
+          return FadeTransition(
+              opacity: animation, child: child);
+        },
+      ),
+    );
     _emailController.clear();
   }
 

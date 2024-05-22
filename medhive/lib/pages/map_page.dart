@@ -1,31 +1,30 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_margins.dart';
+import 'package:medhive/widgets/mh_appbar_logo_right.dart';
 
 import '../helpers/location_helper.dart';
-import '../widgets/mh_appbar_logo_right.dart';
 
-class RiderLocationPage extends StatefulWidget {
+class MapPage extends StatefulWidget {
   final LatLng deliveryAddress;
   final String orderId;
 
-  const RiderLocationPage(
+  const MapPage(
       {super.key, required this.deliveryAddress, required this.orderId});
 
   @override
-  State<RiderLocationPage> createState() => _RiderLocationPageState();
+  State<MapPage> createState() => _MapPageState();
 }
 
-class _RiderLocationPageState extends State<RiderLocationPage> {
+class _MapPageState extends State<MapPage> {
   MapController mapController = MapController();
   LatLng _currentPosition = const LatLng(0, 0);
-  late StreamSubscription<Position> _positionStreamSubscription;
+  late StreamSubscription<DocumentSnapshot> _positionStreamSubscription;
 
   @override
   void initState() {
@@ -34,31 +33,20 @@ class _RiderLocationPageState extends State<RiderLocationPage> {
   }
 
   void _listenToPosition() {
-    var locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 10,
-    );
-
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: locationSettings,
-    ).listen((Position position) {
-      _updateRiderPosition(
-          widget.orderId, position.latitude, position.longitude);
-      setState(() {
-        _currentPosition = LatLng(position.latitude, position.longitude);
-        mapController.move(_currentPosition, mapController.zoom);
-      });
-    });
-  }
-
-  Future<void> _updateRiderPosition(
-      String orderId, double latitude, double longitude) async {
-    final docOrders =
-        FirebaseFirestore.instance.collection('Orders').doc(orderId);
-
-    await docOrders.update({
-      'riderLat': latitude,
-      'riderLong': longitude,
+    _positionStreamSubscription = FirebaseFirestore.instance
+        .collection('Orders')
+        .doc(widget.orderId)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        double lat = data['riderLat'];
+        double lng = data['riderLong'];
+        setState(() {
+          _currentPosition = LatLng(lat, lng);
+          mapController.move(_currentPosition, mapController.zoom);
+        });
+      }
     });
   }
 
@@ -98,27 +86,19 @@ class _RiderLocationPageState extends State<RiderLocationPage> {
                 ),
                 MarkerLayer(
                   markers: [
-                    // Delivery address marker
                     Marker(
                       width: 80.0,
                       height: 80.0,
                       point: deliveryAddress,
-                      builder: (ctx) => const Icon(
-                        Icons.home,
-                        color: MhColors.mhBlueLight,
-                        size: 40.0,
-                      ),
+                      builder: (ctx) => const Icon(Icons.home,
+                          color: MhColors.mhBlueLight, size: 40.0),
                     ),
-                    // Delivery guy's location marker
                     Marker(
                       width: 80.0,
                       height: 80.0,
                       point: _currentPosition,
-                      builder: (ctx) => const Icon(
-                        Icons.location_pin,
-                        color: MhColors.mhPurple,
-                        size: 40.0,
-                      ),
+                      builder: (ctx) => const Icon(Icons.location_pin,
+                          color: MhColors.mhPurple, size: 40.0),
                     ),
                   ],
                 ),
@@ -128,7 +108,7 @@ class _RiderLocationPageState extends State<RiderLocationPage> {
           Padding(
             padding: const EdgeInsets.all(MhMargins.standardPadding),
             child: Text(
-                'Distance to delivery address: ${distance.toStringAsFixed(2)} km'),
+                'The rider is ${distance.toStringAsFixed(2)} km away from you'),
           ),
         ],
       ),

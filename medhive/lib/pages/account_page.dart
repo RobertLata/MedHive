@@ -92,8 +92,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.3),
+                                              color: Colors.grey.withOpacity(0.3),
                                               spreadRadius: 5,
                                               blurRadius: 7,
                                               offset: const Offset(0, 2),
@@ -124,8 +123,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                         ),
                       ),
                       Padding(
-                        padding:
-                            const EdgeInsets.all(MhMargins.standardPadding),
+                        padding: const EdgeInsets.all(MhMargins.standardPadding),
                         child: Text(
                           "You're signed in as: ${currentUser.email}",
                           style: MhTextStyle.bodyRegularStyle
@@ -148,9 +146,18 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       MhAccountTile(
                           text: 'Saved Addresses',
                           onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const SetupLocationPage()));
+                            Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const SetupLocationPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                              ),
+                            );
                           },
                           icon: Icons.location_on),
                       Padding(
@@ -158,9 +165,18 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                         child: MhAccountTile(
                             text: 'Credit Cards',
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const CreditCardsPage()));
+                              Navigator.of(context).push(
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) =>
+                                          const CreditCardsPage(),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                        opacity: animation, child: child);
+                                  },
+                                ),
+                              );
                             },
                             icon: Icons.credit_card_outlined),
                       ),
@@ -184,7 +200,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                                 context);
                           },
                           icon: Icons.info_outline),
-                      const SizedBox(height: MhMargins.mhStandardPadding),
+                      const SizedBox(height: MhMargins.mhStandardPadding,),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -192,16 +208,23 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                             await AuthenticationService().signOut();
                             _resetNavBarIndex(ref);
                             Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const LoginPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                              ),
                               (route) => false,
                             );
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 1.0),
                             shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.zero, // No border radius
+                              borderRadius: BorderRadius.zero, // No border radius
                             ),
                           ),
                           child: Text(
@@ -219,9 +242,18 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                             _resetNavBarIndex(ref);
                             await AuthenticationService().deleteAccount();
                             Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (route) => false);
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                const LoginPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                              ),
+                                  (route) => false,
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero,

@@ -208,9 +208,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const RegisterPage()),
-                                (route) => false);
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                const RegisterPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                      opacity: animation, child: child);
+                                },
+                              ),
+                                  (route) => false,
+                            );
                             _email.clear();
                             _password.clear();
                           })
@@ -234,8 +243,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ref.read(logInPageProvider);
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const InitialPageDecider()),
-            (route) => false);
+          PageRouteBuilder(
+            pageBuilder:
+                (context, animation, secondaryAnimation) =>
+            const InitialPageDecider(),
+            transitionsBuilder: (context, animation,
+                secondaryAnimation, child) {
+              return FadeTransition(
+                  opacity: animation, child: child);
+            },
+          ),
+              (route) => false,
+        );
         showMhSnackbar(context, SUCCESSFUL_LOGIN,
             isError: false);
       }

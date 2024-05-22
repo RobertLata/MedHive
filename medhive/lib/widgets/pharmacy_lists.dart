@@ -51,12 +51,20 @@ class PharmacyLists extends StatelessWidget {
                         child: MhPharmacyTile(
                             pharmacy: pharmacies[index],
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => MhPharmacyDetails(
+                              Navigator.of(context).push(
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation, secondaryAnimation) =>
+                                      MhPharmacyDetails(
                                         pharmacy: pharmacies[index],
                                         hasSpecialOffer:
-                                            _hasSpecialOffer(pharmacies[index]),
-                                      )));
+                                        _hasSpecialOffer(pharmacies[index]),
+                                      ),
+                                  transitionsBuilder:
+                                      (context, animation, secondaryAnimation, child) {
+                                    return FadeTransition(opacity: animation, child: child);
+                                  },
+                                ),
+                              );
                             },
                             hasSpecialOffers:
                                 _hasSpecialOffer(pharmacies[index])),
@@ -94,11 +102,19 @@ class PharmacyLists extends StatelessWidget {
                         child: MhPharmacyTile(
                             pharmacy: pharmaciesWithDiscount[index],
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => MhPharmacyDetails(
+                              Navigator.of(context).push(
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation, secondaryAnimation) =>
+                                      MhPharmacyDetails(
                                         pharmacy: pharmaciesWithDiscount[index],
                                         hasSpecialOffer: true,
-                                      )));
+                                      ),
+                                  transitionsBuilder:
+                                      (context, animation, secondaryAnimation, child) {
+                                    return FadeTransition(opacity: animation, child: child);
+                                  },
+                                ),
+                              );
                             },
                             hasSpecialOffers: true),
                       );

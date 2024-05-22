@@ -78,29 +78,31 @@ class _FirebaseStorageFilePageState
                             .copyWith(color: MhColors.mhBlueLight),
                       ),
                     ),
-                    ...orders.map((order) => order.orderState == 'In Progress'
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: MhMargins.mediumSmallMargin,
-                                horizontal: MhMargins.standardPadding),
-                            child: OrderTile(
-                              id: order.id,
-                              pharmacyName: order.pharmacyName,
-                              pharmacyLogo: order.pharmacyLogo,
-                              deliveryDate: order.deliveryDate,
-                              location: order.location,
-                              products: order.products,
-                              productQuantity: order.productQuantity,
-                              totalPrice: order.totalPrice,
-                              deliveryState: order.orderState,
-                            ),
-                          )
-                        : const SizedBox()),
+                    ...orders.map((order) =>
+                        order.orderState == 'In Progress' &&
+                                order.isPrescriptionValid == true
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: MhMargins.mediumSmallMargin,
+                                    horizontal: MhMargins.standardPadding),
+                                child: OrderTile(
+                                  id: order.id,
+                                  pharmacyName: order.pharmacyName,
+                                  pharmacyLogo: order.pharmacyLogo,
+                                  deliveryDate: order.deliveryDate,
+                                  location: order.location,
+                                  products: order.products,
+                                  productQuantity: order.productQuantity,
+                                  totalPrice: order.totalPrice,
+                                  deliveryState: order.orderState,
+                                ),
+                              )
+                            : const SizedBox()),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: MhMargins.standardPadding),
                       child: Text(
-                        'Loaded Prescriptions',
+                        'Prescriptions to check',
                         style: MhTextStyle.heading4Style
                             .copyWith(color: MhColors.mhBlueLight),
                       ),
@@ -115,30 +117,41 @@ class _FirebaseStorageFilePageState
                           }
                           return Column(
                             children: [
-                              ...snapshot.data!.map((file) => Column(
-                                    children: [
-                                      ListTile(
-                                        title: Text('Order: ${file["name"]}'),
-                                        subtitle: InkWell(
-                                          onTap: () {
-                                            UrlHelper.launchURLBrowser(
-                                                Uri.parse(file["url"]));
-                                          },
-                                          child: Text(file["url"]),
-                                        ),
-                                      ),
-                                      MhButton(
-                                        text: 'Approve',
-                                        width: 180,
-                                        onTap: () async {
-                                          UserOrder orderToValidate =
-                                              orders.firstWhere((element) =>
-                                                  element.id == file["name"]);
-                                          await _validateOrder(orderToValidate);
-                                        },
-                                      ),
-                                    ],
-                                  )),
+                              ...snapshot.data!.map((file) {
+                                UserOrder? order = orders
+                                    .where((order) => order.id == file["name"])
+                                    .firstOrNull;
+                                return order?.isPrescriptionValid == true ||
+                                        order == null
+                                    ? const SizedBox()
+                                    : Column(
+                                        children: [
+                                          ListTile(
+                                            title:
+                                                Text('Order: ${file["name"]}'),
+                                            subtitle: InkWell(
+                                              onTap: () {
+                                                UrlHelper.launchURLBrowser(
+                                                    Uri.parse(file["url"]));
+                                              },
+                                              child: Text(file["url"]),
+                                            ),
+                                          ),
+                                          MhButton(
+                                            text: 'Approve',
+                                            width: 180,
+                                            onTap: () async {
+                                              UserOrder orderToValidate =
+                                                  orders.firstWhere((element) =>
+                                                      element.id ==
+                                                      file["name"]);
+                                              await _validateOrder(
+                                                  orderToValidate);
+                                            },
+                                          ),
+                                        ],
+                                      );
+                              }),
                             ],
                           );
                         } else {
@@ -155,8 +168,16 @@ class _FirebaseStorageFilePageState
                         onPressed: () async {
                           await AuthenticationService().signOut();
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => const LoginPage()),
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const LoginPage(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                return FadeTransition(
+                                    opacity: animation, child: child);
+                              },
+                            ),
                             (route) => false,
                           );
                         },
@@ -180,8 +201,16 @@ class _FirebaseStorageFilePageState
                           await firebaseController.deletePrivateUser();
                           await AuthenticationService().deleteAccount();
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => const LoginPage()),
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const LoginPage(),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                return FadeTransition(
+                                    opacity: animation, child: child);
+                              },
+                            ),
                             (route) => false,
                           );
                         },

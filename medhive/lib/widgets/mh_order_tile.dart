@@ -54,8 +54,8 @@ class OrderTile extends StatelessWidget {
                         left: MhMargins.standardPadding,
                         top: MhMargins.standardPadding),
                     child: Container(
-                      width: 100,
-                      height: 100,
+                      width: 80,
+                      height: 80,
                       decoration: BoxDecoration(
                         borderRadius:
                             BorderRadius.circular(MhMargins.standardPadding),
@@ -132,7 +132,7 @@ class OrderTile extends StatelessWidget {
                             children: [
                               Text(
                                 '${totalPrice.toStringAsFixed(2)} lei',
-                                style: MhTextStyle.heading4Style
+                                style: MhTextStyle.bodyRegularStyle
                                     .copyWith(color: MhColors.mhBlueRegular),
                               ),
                               InkWell(
@@ -141,22 +141,34 @@ class OrderTile extends StatelessWidget {
                                     _handOrder(id, pharmacyName);
                                   } else if (deliveryState == 'In Delivery') {
                                     Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                OrderStatePage(orderId: id)));
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation, secondaryAnimation) =>
+                                            OrderStatePage(orderId: id),
+                                        transitionsBuilder:
+                                            (context, animation, secondaryAnimation, child) {
+                                          return FadeTransition(opacity: animation, child: child);
+                                        },
+                                      ),
+                                    );
                                   } else {
                                     Pharmacy pharmacy = pharmacies
                                         .where((element) =>
                                             element.name == pharmacyName)
                                         .first;
                                     Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                MhPharmacyDetails(
-                                                    pharmacy: pharmacy,
-                                                    hasSpecialOffer:
-                                                        _hasSpecialOffer(
-                                                            pharmacy))));
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation, secondaryAnimation) =>
+                                            MhPharmacyDetails(
+                                                pharmacy: pharmacy,
+                                                hasSpecialOffer:
+                                                _hasSpecialOffer(
+                                                    pharmacy)),
+                                        transitionsBuilder:
+                                            (context, animation, secondaryAnimation, child) {
+                                          return FadeTransition(opacity: animation, child: child);
+                                        },
+                                      ),
+                                    );
                                   }
                                 },
                                 child: Text(
@@ -165,7 +177,7 @@ class OrderTile extends StatelessWidget {
                                       : deliveryState == 'In Delivery'
                                           ? 'See details'
                                           : 'See partner',
-                                  style: MhTextStyle.heading4Style
+                                  style: MhTextStyle.bodyRegularStyle
                                       .copyWith(color: MhColors.mhPurple),
                                 ),
                               )

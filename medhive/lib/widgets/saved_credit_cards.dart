@@ -34,8 +34,16 @@ class SavedCreditCards extends StatelessWidget {
                   trailing: const Icon(Icons.chevron_right,
                       color: MhColors.mhBlueDark),
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const CardValidationPage()));
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                        const CardValidationPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          return FadeTransition(opacity: animation, child: child);
+                        },
+                      ),
+                    );
                   },
                 ),
                 Padding(

@@ -7,7 +7,7 @@ import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
 import 'package:medhive/entities/order.dart';
 import 'package:medhive/entities/pharmacy.dart';
-import 'package:medhive/pages/rider_location_page.dart';
+import 'package:medhive/pages/map_page.dart';
 import 'package:medhive/pages/tab_decider.dart';
 import 'package:medhive/widgets/comment_section.dart';
 import 'package:medhive/widgets/mh_appbar_logo_right.dart';
@@ -34,11 +34,20 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => const TabDecider(
-                      initialIndex: 2,
-                    )),
-            (route) => false);
+          PageRouteBuilder(
+            pageBuilder:
+                (context, animation, secondaryAnimation) =>
+            const TabDecider(
+              initialIndex: 2,
+            ),
+            transitionsBuilder: (context, animation,
+                secondaryAnimation, child) {
+              return FadeTransition(
+                  opacity: animation, child: child);
+            },
+          ),
+              (route) => false,
+        );
         ref.read(tabIndexProvider.notifier).selectTab(2);
         pharmacy?.medicines.forEach((medicine) {
           ref
@@ -62,11 +71,20 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
                 isBackVisible: true,
                 onPressed: () {
                   Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => const TabDecider(
-                                initialIndex: 2,
-                              )),
-                      (route) => false);
+                    PageRouteBuilder(
+                      pageBuilder:
+                          (context, animation, secondaryAnimation) =>
+                      const TabDecider(
+                        initialIndex: 2,
+                      ),
+                      transitionsBuilder: (context, animation,
+                          secondaryAnimation, child) {
+                        return FadeTransition(
+                            opacity: animation, child: child);
+                      },
+                    ),
+                        (route) => false,
+                  );
                   ref.read(tabIndexProvider.notifier).selectTab(2);
                   pharmacy?.medicines.forEach((medicine) {
                     ref
@@ -121,7 +139,9 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
                                               builder: (context) => MapPage(
                                                     deliveryAddress:
                                                         const LatLng(
-                                                            45.7409, 21.2007),
+                                                            45.7726717,
+                                                            21.2255738),
+                                                    orderId: order.id,
                                                   )));
                                     },
                                     child: Padding(
@@ -170,8 +190,8 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
                                       ),
                                       Lottie.asset(
                                         'lotties/order_delivered.json',
-                                        width: 300,
-                                        height: 300,
+                                        width: 200,
+                                        height: 200,
                                         fit: BoxFit.contain,
                                       ),
                                       Text(

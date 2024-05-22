@@ -61,7 +61,7 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: 150,
+                          width: 110,
                           child: Text(
                             widget.medicine.name,
                             style: MhTextStyle.bodyBoldStyle
@@ -71,7 +71,7 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                           ),
                         ),
                         SizedBox(
-                          width: 150,
+                          width: 110,
                           child: Text(
                             widget.medicine.manufacturer,
                             style: MhTextStyle.bodyRegularStyle

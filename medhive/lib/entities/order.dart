@@ -11,6 +11,8 @@ class UserOrder {
   bool? isPrescriptionValid;
   String? orderState;
   String? deliveryRiderId;
+  double? riderLat;
+  double? riderLong;
 
   UserOrder({
     required this.id,
@@ -25,6 +27,8 @@ class UserOrder {
     this.isPrescriptionValid,
     this.orderState,
     this.deliveryRiderId,
+    this.riderLat,
+    this.riderLong,
   });
 
   factory UserOrder.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,8 @@ class UserOrder {
       isPrescriptionValid: json['isPrescriptionValid'] as bool?,
       orderState: json['orderState'] as String?,
       deliveryRiderId: json['deliveryRiderId'] as String?,
+      riderLat: json['riderLat'] as double?,
+      riderLong: json['riderLong'] as double?,
     );
   }
 
@@ -58,6 +64,8 @@ class UserOrder {
       'isPrescriptionValid': isPrescriptionValid,
       'orderState': orderState,
       'deliveryRiderId': deliveryRiderId,
+      'riderLat': riderLat,
+      'riderLong': riderLong,
     };
   }
 }

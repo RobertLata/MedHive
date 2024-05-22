@@ -58,12 +58,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                               padding: const EdgeInsets.symmetric(horizontal: MhMargins.extraSmallMargin),
                               child: InkWell(
                                   onTap: () {
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) => SetupLocationPage(
+                                    Navigator.of(context).push(
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation, secondaryAnimation) =>
+                                            SetupLocationPage(
                                               onAddressChanged: () {
                                                 setState(() {});
                                               },
-                                            )));
+                                            ),
+                                        transitionsBuilder:
+                                            (context, animation, secondaryAnimation, child) {
+                                          return FadeTransition(opacity: animation, child: child);
+                                        },
+                                      ),
+                                    );
                                   },
                                   child: Text(
                                     currentUser?.selectedAddress ?? 'Select Address',
