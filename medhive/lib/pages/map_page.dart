@@ -12,10 +12,14 @@ import '../helpers/location_helper.dart';
 
 class MapPage extends StatefulWidget {
   final LatLng deliveryAddress;
+  final LatLng riderAddress;
   final String orderId;
 
   const MapPage(
-      {super.key, required this.deliveryAddress, required this.orderId});
+      {super.key,
+      required this.deliveryAddress,
+      required this.riderAddress,
+      required this.orderId});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -23,7 +27,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   MapController mapController = MapController();
-  LatLng _currentPosition = const LatLng(0, 0);
+  late LatLng _currentPosition = widget.riderAddress;
   late StreamSubscription<DocumentSnapshot> _positionStreamSubscription;
 
   @override
@@ -97,7 +101,7 @@ class _MapPageState extends State<MapPage> {
                       width: 80.0,
                       height: 80.0,
                       point: _currentPosition,
-                      builder: (ctx) => const Icon(Icons.location_pin,
+                      builder: (ctx) => const Icon(Icons.directions_bike,
                           color: MhColors.mhPurple, size: 40.0),
                     ),
                   ],

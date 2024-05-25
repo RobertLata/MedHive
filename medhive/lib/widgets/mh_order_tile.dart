@@ -137,35 +137,42 @@ class OrderTile extends StatelessWidget {
                               ),
                               InkWell(
                                 onTap: () {
+                                  Pharmacy pharmacy = pharmacies
+                                      .where((element) =>
+                                          element.name == pharmacyName)
+                                      .first;
                                   if (deliveryState == 'In Progress') {
-                                    _handOrder(id, pharmacyName);
+                                    _handOrder(
+                                        id, pharmacyName, pharmacy.riderId);
                                   } else if (deliveryState == 'In Delivery') {
                                     Navigator.of(context).push(
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) =>
-                                            OrderStatePage(orderId: id),
-                                        transitionsBuilder:
-                                            (context, animation, secondaryAnimation, child) {
-                                          return FadeTransition(opacity: animation, child: child);
+                                        pageBuilder: (context, animation,
+                                                secondaryAnimation) =>
+                                            OrderStatePage(
+                                          orderId: id,
+                                          pharmacy: pharmacy,
+                                        ),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return FadeTransition(
+                                              opacity: animation, child: child);
                                         },
                                       ),
                                     );
                                   } else {
-                                    Pharmacy pharmacy = pharmacies
-                                        .where((element) =>
-                                            element.name == pharmacyName)
-                                        .first;
                                     Navigator.of(context).push(
                                       PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) =>
+                                        pageBuilder: (context, animation,
+                                                secondaryAnimation) =>
                                             MhPharmacyDetails(
                                                 pharmacy: pharmacy,
                                                 hasSpecialOffer:
-                                                _hasSpecialOffer(
-                                                    pharmacy)),
-                                        transitionsBuilder:
-                                            (context, animation, secondaryAnimation, child) {
-                                          return FadeTransition(opacity: animation, child: child);
+                                                    _hasSpecialOffer(pharmacy)),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return FadeTransition(
+                                              opacity: animation, child: child);
                                         },
                                       ),
                                     );
@@ -218,15 +225,14 @@ class OrderTile extends StatelessWidget {
     return false;
   }
 
-  Future<void> _handOrder(String orderId, String pharmacyName) async {
+  Future<void> _handOrder(
+      String orderId, String pharmacyName, String riderId) async {
     final docOrders =
         FirebaseFirestore.instance.collection('Orders').doc(orderId);
 
     await docOrders.update({
       'orderState': 'In Delivery',
-      'deliveryRiderId': pharmacyName == 'Health Harmony'
-          ? 'QbopXuLJiXcU1dWjEg2Ksrq6cTC3'
-          : '',
+      'deliveryRiderId': riderId,
     });
   }
 }

@@ -92,6 +92,8 @@ class _SetupLocationPageState extends State<SetupLocationPage> {
     String? addressName;
     String? addressStreet;
     String? addressLocation;
+    double? latitude;
+    double? longitude;
 
     return showDialog<void>(
       context: context,
@@ -139,6 +141,38 @@ class _SetupLocationPageState extends State<SetupLocationPage> {
                       ),
                       TextFormField(
                         decoration: const InputDecoration(
+                          labelText: 'Latitude',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter the address latitude';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          if (value != null) {
+                            latitude = double.parse(value);
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Longitude',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter the address longitude';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          if (value != null) {
+                            longitude = double.parse(value);
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
                           labelText: 'City',
                         ),
                         validator: (value) {
@@ -182,6 +216,8 @@ class _SetupLocationPageState extends State<SetupLocationPage> {
                       name: addressName!,
                       street: addressStreet!,
                       location: addressLocation!,
+                      latitude: latitude!,
+                      longitude: longitude!,
                       isPrimary: false,
                       userId: AuthenticationService.currentUser!.uid);
 
@@ -257,7 +293,8 @@ class _SetupLocationPageState extends State<SetupLocationPage> {
     }
 
     await batch.commit();
-    await _updatePrivateUserAddress(address.street, address.location);
+    await _updatePrivateUserAddress(
+        address.street, address.location, address.latitude, address.longitude);
   }
 
   Future<void> _deleteAddress(Address address) async {
@@ -268,13 +305,17 @@ class _SetupLocationPageState extends State<SetupLocationPage> {
     await docRef.delete();
   }
 
-  Future<void> _updatePrivateUserAddress(
-      String addressLocation, String addressCity) async {
+  Future<void> _updatePrivateUserAddress(String addressLocation,
+      String addressCity, double latitude, double longitude) async {
     final collection = FirebaseFirestore.instance.collection('PrivateUsers');
 
     final docRef = collection.doc(AuthenticationService.currentUserId);
 
-    await docRef.update({'selectedAddress': "$addressLocation, $addressCity"});
+    await docRef.update({
+      'selectedAddress': "$addressLocation, $addressCity",
+      'addressLat': latitude,
+      'addressLong': longitude
+    });
     widget.onAddressChanged?.call();
   }
 }

@@ -115,7 +115,7 @@ class _RiderLocationPageState extends State<RiderLocationPage> {
                       height: 80.0,
                       point: _currentPosition,
                       builder: (ctx) => const Icon(
-                        Icons.location_pin,
+                        Icons.directions_bike,
                         color: MhColors.mhPurple,
                         size: 40.0,
                       ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medhive/constants/mh_colors.dart';
 import 'package:medhive/constants/mh_margins.dart';
 import 'package:medhive/constants/mh_style.dart';
+import 'package:medhive/entities/private_user.dart';
 import 'package:medhive/pages/mh_prescription_page.dart';
 import 'package:medhive/pages/tab_decider.dart';
 import 'package:medhive/services/authentication_service.dart';
@@ -43,215 +44,255 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
     final medicineState = ref.watch(medicineListProvider);
     final medicinesWithNoDuplicates = medicineState.medicines.toSet().toList();
 
-    return StreamBuilder<List<Pharmacy>>(
-        stream: _readPharmacies(),
+    return StreamBuilder<List<PrivateUser>>(
+        stream: _readUsers(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Scaffold(
-              backgroundColor: MhColors.mhWhite,
-              bottomNavigationBar: medicineState.medicines.isEmpty
-                  ? const SizedBox()
-                  : InkWell(
-                      onTap: () async {
-                        final pharmacies = snapshot.data!;
-                        Pharmacy pharmacy = pharmacies
-                            .where((element) =>
-                                element.id == medicinesWithNoDuplicates[0].id)
-                            .first;
-                        List<Medicine> medicinesFromPharmacy = pharmacies
-                            .where((element) =>
-                                element.id == medicinesWithNoDuplicates[0].id)
-                            .first
-                            .medicines;
-                        List<dynamic> products = [];
-                        totalPrice = 0.0;
-                        productsQuantity = [];
+            PrivateUser user = snapshot.data!.where((user) => user.id == AuthenticationService.currentUserId).first;
+            return StreamBuilder<List<Pharmacy>>(
+                stream: _readPharmacies(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Scaffold(
+                      backgroundColor: MhColors.mhWhite,
+                      bottomNavigationBar: medicineState.medicines.isEmpty
+                          ? const SizedBox()
+                          : InkWell(
+                              onTap: () async {
+                                final pharmacies = snapshot.data!;
+                                Pharmacy pharmacy = pharmacies
+                                    .where((element) =>
+                                        element.id ==
+                                        medicinesWithNoDuplicates[0].id)
+                                    .first;
+                                List<Medicine> medicinesFromPharmacy =
+                                    pharmacies
+                                        .where((element) =>
+                                            element.id ==
+                                            medicinesWithNoDuplicates[0].id)
+                                        .first
+                                        .medicines;
+                                List<dynamic> products = [];
+                                totalPrice = 0.0;
+                                productsQuantity = [];
 
-                        Map<String, int> lastMedicineQuantities = {};
+                                Map<String, int> lastMedicineQuantities = {};
 
-                        for (Medicine medicine in medicineState.medicines) {
-                          lastMedicineQuantities[medicine.name] =
-                              medicineState.getMedicineDose(medicine);
-                        }
-                        lastMedicineQuantities.forEach((name, quantity) {
-                          productsQuantity.add(quantity);
-                        });
-                        medicineState.medicines.forEach((medicine) {
-                          totalPrice += medicine.price;
-                        });
-                        for (int i = 0; i < productsQuantity.length; i++) {
-                          products.add(medicinesFromPharmacy[i].name);
-                        }
-                        List<Medicine> medicinesThatRequirePrescription = [];
-                        for (int i = 0;
-                            i < medicinesWithNoDuplicates.length;
-                            i++) {
-                          if (medicinesWithNoDuplicates[i].needsPrescription) {
-                            medicinesThatRequirePrescription
-                                .add(medicinesWithNoDuplicates[i]);
-                          }
-                        }
-                        if (medicinesThatRequirePrescription.isNotEmpty) {
-                          final String docId = generateRandomDocumentId();
-                          UserOrder order = UserOrder(
-                              id: docId,
-                              pharmacyName: pharmacy.name,
-                              pharmacyLogo: pharmacy.logo,
-                              deliveryDate: '',
-                              location: pharmacy.address,
-                              products: products,
-                              productQuantity: productsQuantity,
-                              totalPrice: totalPrice,
-                              userId: AuthenticationService.currentUserId!,
-                              orderState: 'In Progress',
-                              isOrderPayed: false);
-                          await _createOrder(order: order);
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      MhPrescriptionPage(
-                                medicineThatRequirePrescription:
-                                    medicinesThatRequirePrescription,
-                                order: order,
-                                pharmacy: pharmacy,
-                                totalPrice: totalPrice,
-                                orderId: docId,
-                              ),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                    opacity: animation, child: child);
+                                for (Medicine medicine
+                                    in medicineState.medicines) {
+                                  lastMedicineQuantities[medicine.name] =
+                                      medicineState.getMedicineDose(medicine);
+                                }
+                                lastMedicineQuantities
+                                    .forEach((name, quantity) {
+                                  productsQuantity.add(quantity);
+                                });
+                                medicineState.medicines.forEach((medicine) {
+                                  totalPrice += medicine.price;
+                                });
+                                for (int i = 0;
+                                    i < productsQuantity.length;
+                                    i++) {
+                                  products.add(medicinesFromPharmacy[i].name);
+                                }
+                                List<Medicine>
+                                    medicinesThatRequirePrescription = [];
+                                for (int i = 0;
+                                    i < medicinesWithNoDuplicates.length;
+                                    i++) {
+                                  if (medicinesWithNoDuplicates[i]
+                                      .needsPrescription) {
+                                    medicinesThatRequirePrescription
+                                        .add(medicinesWithNoDuplicates[i]);
+                                  }
+                                }
+                                if (medicinesThatRequirePrescription
+                                    .isNotEmpty) {
+                                  final String docId =
+                                      generateRandomDocumentId();
+                                  UserOrder order = UserOrder(
+                                      id: docId,
+                                      pharmacyName: pharmacy.name,
+                                      pharmacyLogo: pharmacy.logo,
+                                      deliveryDate: '',
+                                      location: user.selectedAddress ?? '',
+                                      products: products,
+                                      productQuantity: productsQuantity,
+                                      totalPrice: totalPrice,
+                                      addressLat: user.addressLat,
+                                      addressLong: user.addressLong,
+                                      userId:
+                                          AuthenticationService.currentUserId!,
+                                      orderState: 'In Progress',
+                                      isOrderPayed: false);
+                                  await _createOrder(order: order);
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          MhPrescriptionPage(
+                                        medicineThatRequirePrescription:
+                                            medicinesThatRequirePrescription,
+                                        order: order,
+                                        pharmacy: pharmacy,
+                                        totalPrice: totalPrice,
+                                        orderId: docId,
+                                      ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        return FadeTransition(
+                                            opacity: animation, child: child);
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  final String docId =
+                                      generateRandomDocumentId();
+                                  UserOrder order = UserOrder(
+                                      id: docId,
+                                      pharmacyName: pharmacy.name,
+                                      pharmacyLogo: pharmacy.logo,
+                                      deliveryDate: '',
+                                      location: user.selectedAddress ?? '',
+                                      products: products,
+                                      productQuantity: productsQuantity,
+                                      totalPrice: totalPrice,
+                                      addressLat: user.addressLat,
+                                      addressLong: user.addressLong,
+                                      userId:
+                                          AuthenticationService.currentUserId!,
+                                      orderState: 'In Progress',
+                                      isPrescriptionValid: true,
+                                      isOrderPayed: false);
+                                  await _createOrder(order: order);
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          MhFinishOrderPage(
+                                        totalPrice: totalPrice,
+                                        pharmacy: pharmacy,
+                                        orderId: docId,
+                                      ),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        return FadeTransition(
+                                            opacity: animation, child: child);
+                                      },
+                                    ),
+                                  );
+                                }
                               },
-                            ),
-                          );
-                        } else {
-                          final String docId = generateRandomDocumentId();
-                          UserOrder order = UserOrder(
-                              id: docId,
-                              pharmacyName: pharmacy.name,
-                              pharmacyLogo: pharmacy.logo,
-                              deliveryDate: '',
-                              location: pharmacy.address,
-                              products: products,
-                              productQuantity: productsQuantity,
-                              totalPrice: totalPrice,
-                              userId: AuthenticationService.currentUserId!,
-                              orderState: 'In Progress',
-                              isPrescriptionValid: true,
-                              isOrderPayed: false);
-                          await _createOrder(order: order);
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      MhFinishOrderPage(
-                                totalPrice: totalPrice,
-                                pharmacy: pharmacy,
-                                orderId: docId,
-                              ),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                    opacity: animation, child: child);
-                              },
-                            ),
-                          );
-                        }
-                      },
-                      child: Container(
-                        height: 70,
-                        width: double.infinity,
-                        color: MhColors.mhPurple,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  right: MhMargins.standardPadding),
-                              child: Text(
-                                'Next step',
-                                style: MhTextStyle.bodyRegularStyle
-                                    .copyWith(color: MhColors.mhWhite),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-              appBar: const MhAppBarLogoRight(),
-              body: medicineState.medicines.isEmpty
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/empty_basket.png',
-                          height: 300,
-                          width: 300,
-                        ),
-                        Text(
-                          'Your shopping basket is empty',
-                          style: MhTextStyle.heading4Style
-                              .copyWith(color: MhColors.mhBlueLight),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 60,
-                              horizontal: MhMargins.mhStandardPadding),
-                          child: MhButton(
-                            text: 'Start shopping',
-                            onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation,
-                                          secondaryAnimation) =>
-                                      const TabDecider(
-                                    initialIndex: 0,
-                                  ),
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    return FadeTransition(
-                                        opacity: animation, child: child);
-                                  },
+                              child: Container(
+                                height: 70,
+                                width: double.infinity,
+                                color: MhColors.mhPurple,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: MhMargins.standardPadding),
+                                      child: Text(
+                                        'Next step',
+                                        style: MhTextStyle.bodyRegularStyle
+                                            .copyWith(color: MhColors.mhWhite),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                (route) => false,
-                              );
-                              ref.read(tabIndexProvider.notifier).selectTab(0);
-                            },
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.all(MhMargins.standardPadding),
-                          child: Text(
-                            'My order:',
-                            style: MhTextStyle.heading4Style
-                                .copyWith(color: MhColors.mhBlueRegular),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: medicinesWithNoDuplicates.length,
-                            itemBuilder: (context, index) =>
-                                MhMedicineBasketTile(
-                              medicine: medicinesWithNoDuplicates[index],
-                              noEditOption: false,
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-            );
+                      appBar: const MhAppBarLogoRight(),
+                      body: medicineState.medicines.isEmpty
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/empty_basket.png',
+                                  height: 300,
+                                  width: 300,
+                                ),
+                                Text(
+                                  'Your shopping basket is empty',
+                                  style: MhTextStyle.heading4Style
+                                      .copyWith(color: MhColors.mhBlueLight),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 60,
+                                      horizontal: MhMargins.mhStandardPadding),
+                                  child: MhButton(
+                                    text: 'Start shopping',
+                                    onTap: () {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation,
+                                                  secondaryAnimation) =>
+                                              const TabDecider(
+                                            initialIndex: 0,
+                                          ),
+                                          transitionsBuilder: (context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child) {
+                                            return FadeTransition(
+                                                opacity: animation,
+                                                child: child);
+                                          },
+                                        ),
+                                        (route) => false,
+                                      );
+                                      ref
+                                          .read(tabIndexProvider.notifier)
+                                          .selectTab(0);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(
+                                      MhMargins.standardPadding),
+                                  child: Text(
+                                    'My order:',
+                                    style: MhTextStyle.heading4Style.copyWith(
+                                        color: MhColors.mhBlueRegular),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: medicinesWithNoDuplicates.length,
+                                    itemBuilder: (context, index) =>
+                                        MhMedicineBasketTile(
+                                      medicine:
+                                          medicinesWithNoDuplicates[index],
+                                      noEditOption: false,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Error"));
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: MhColors.mhBlueDark,
+                      ),
+                    );
+                  }
+                });
           } else if (snapshot.hasError) {
             return const Center(child: Text("Error"));
           } else {
@@ -288,4 +329,10 @@ class _ShoppingBasketPageState extends ConsumerState<ShoppingBasketPage> {
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Pharmacy.fromJson(doc.data())).toList());
+
+  Stream<List<PrivateUser>> _readUsers() => FirebaseFirestore.instance
+      .collection('PrivateUsers')
+      .snapshots()
+      .map((snapshot) =>
+      snapshot.docs.map((doc) => PrivateUser.fromJson(doc.data())).toList());
 }

@@ -18,9 +18,9 @@ import '../controllers/tab_controller.dart';
 import '../widgets/rating_feedback.dart';
 
 class OrderStatePage extends ConsumerStatefulWidget {
-  final Pharmacy? pharmacy;
+  final Pharmacy pharmacy;
   final String orderId;
-  const OrderStatePage({super.key, this.pharmacy, required this.orderId});
+  const OrderStatePage({super.key, required this.pharmacy, required this.orderId});
 
   @override
   ConsumerState<OrderStatePage> createState() => _OrderStatePageState();
@@ -35,18 +35,16 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
-            pageBuilder:
-                (context, animation, secondaryAnimation) =>
-            const TabDecider(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const TabDecider(
               initialIndex: 2,
             ),
-            transitionsBuilder: (context, animation,
-                secondaryAnimation, child) {
-              return FadeTransition(
-                  opacity: animation, child: child);
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
             },
           ),
-              (route) => false,
+          (route) => false,
         );
         ref.read(tabIndexProvider.notifier).selectTab(2);
         pharmacy?.medicines.forEach((medicine) {
@@ -72,18 +70,16 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
                 onPressed: () {
                   Navigator.of(context).pushAndRemoveUntil(
                     PageRouteBuilder(
-                      pageBuilder:
-                          (context, animation, secondaryAnimation) =>
-                      const TabDecider(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const TabDecider(
                         initialIndex: 2,
                       ),
-                      transitionsBuilder: (context, animation,
-                          secondaryAnimation, child) {
-                        return FadeTransition(
-                            opacity: animation, child: child);
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
                       },
                     ),
-                        (route) => false,
+                    (route) => false,
                   );
                   ref.read(tabIndexProvider.notifier).selectTab(2);
                   pharmacy?.medicines.forEach((medicine) {
@@ -132,42 +128,53 @@ class _OrderStatePageState extends ConsumerState<OrderStatePage> {
                                     style: MhTextStyle.heading4Style.copyWith(
                                         color: MhColors.mhBlueRegular),
                                   ),
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                              builder: (context) => MapPage(
-                                                    deliveryAddress:
-                                                        const LatLng(
-                                                            45.7726717,
-                                                            21.2255738),
-                                                    orderId: order.id,
-                                                  )));
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: MhMargins.standardPadding),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.location_on,
-                                            color: MhColors.mhPurple,
+                                  order.riderLat != null &&
+                                          order.riderLong != null
+                                      ? InkWell(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MapPage(
+                                                          riderAddress: LatLng(
+                                                              order.riderLat ??
+                                                                  0,
+                                                              order.riderLong ??
+                                                                  0),
+                                                          deliveryAddress:
+                                                              LatLng(
+                                                              order.addressLat ?? 0,
+                                                                  order.addressLong ?? 0),
+                                                          orderId: order.id,
+                                                        )));
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical:
+                                                    MhMargins.standardPadding),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const Icon(
+                                                  Icons.location_on,
+                                                  color: MhColors.mhPurple,
+                                                ),
+                                                Text(
+                                                  'See on map',
+                                                  style: MhTextStyle
+                                                      .bodySmallRegularStyle
+                                                      .copyWith(
+                                                          color: MhColors
+                                                              .mhPurple),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          Text(
-                                            'See on map',
-                                            style: MhTextStyle
-                                                .bodySmallRegularStyle
-                                                .copyWith(
-                                                    color: MhColors.mhPurple),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                        )
+                                      : const SizedBox(),
                                   Lottie.asset(
                                     'lotties/in_delivery.json',
                                     width: 300,

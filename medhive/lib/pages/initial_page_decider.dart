@@ -18,7 +18,7 @@ class InitialPageDecider extends ConsumerWidget {
     return authState.when(
         data: (data) {
           if (data != null) {
-            if (data.email == 'health.harmony@gmail.com') {
+            if (data.email == 'health.harmony@gmail.com' || data.email == 'wellspring.pharmacy@gmail.com' || data.email == 'apothecare.essentials@gmail.com' || data.email == 'vitagreen@gmail.com' || data.email == 'pillandleafwellness@gmail.com') {
               return const FirebaseStorageFilePage();
             } else if (data.email != null && data.email!.contains('rider')) {
               return const RiderPage();

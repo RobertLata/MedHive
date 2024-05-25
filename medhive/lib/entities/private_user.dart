@@ -6,6 +6,8 @@ class PrivateUser {
   String? profileImage;
   String? selectedAddress;
   double? bankAccount;
+  double? addressLat;
+  double? addressLong;
 
   PrivateUser({
     required this.id,
@@ -15,6 +17,8 @@ class PrivateUser {
     this.profileImage,
     this.selectedAddress,
     this.bankAccount,
+    this.addressLat,
+    this.addressLong,
   });
 
   factory PrivateUser.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,8 @@ class PrivateUser {
       profileImage: json['profileImage'] as String?,
       selectedAddress: json['selectedAddress'] as String?,
       bankAccount: json['bankAccount'] as double?,
+      addressLat: json['addressLat'] as double?,
+      addressLong: json['addressLong'] as double?,
     );
   }
 
@@ -37,7 +43,9 @@ class PrivateUser {
       'email': email,
       'profileImage': profileImage,
       'selectedAddress': selectedAddress,
-      'bankAccount': bankAccount
+      'bankAccount': bankAccount,
+      'addressLat': addressLat,
+      'addressLong': addressLong,
     };
   }
 }

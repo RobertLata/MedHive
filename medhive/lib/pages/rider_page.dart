@@ -142,9 +142,9 @@ class RiderPage extends ConsumerWidget {
                                               pageBuilder: (context, animation, secondaryAnimation) =>
                                                   RiderLocationPage(
                                                     deliveryAddress:
-                                                    const LatLng(
-                                                        45.7726717,
-                                                        21.2255738),
+                                                    LatLng(
+                                                        order?.addressLat ?? 0,
+                                                        order?.addressLong ?? 0),
                                                     orderId:
                                                     order?.id ?? '',
                                                   ),

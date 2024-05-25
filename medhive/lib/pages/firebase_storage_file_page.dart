@@ -25,6 +25,7 @@ class FirebaseStorageFilePage extends ConsumerStatefulWidget {
 class _FirebaseStorageFilePageState
     extends ConsumerState<FirebaseStorageFilePage> {
   late Future<List<Map<String, dynamic>>> _fileList;
+  String pharmacyName = '';
 
   @override
   void initState() {
@@ -34,10 +35,26 @@ class _FirebaseStorageFilePageState
 
   Future<List<Map<String, dynamic>>> listFiles() async {
     List<Map<String, dynamic>> files = [];
-    String pharmacyName =
-        AuthenticationService.currentUserEmail == 'health.harmony@gmail.com'
-            ? 'Health Harmony'
-            : '';
+    switch (AuthenticationService.currentUserEmail) {
+      case 'health.harmony@gmail.com':
+        pharmacyName = 'Health Harmony';
+        break;
+      case 'wellspring.pharmacy@gmail.com':
+        pharmacyName = 'Wellspring Pharmacy';
+        break;
+      case 'apothecare.essentials@gmail.com':
+        pharmacyName = 'Apothecare Essentials';
+        break;
+      case 'vitagreen@gmail.com':
+        pharmacyName = 'Vitagreen';
+        break;
+      case 'pillandleafwellness@gmail.com':
+        pharmacyName = 'Pill & Leaf Wellness';
+        break;
+      default:
+        pharmacyName = '';
+        break;
+    }
 
     final ListResult result =
         await FirebaseStorage.instance.ref(pharmacyName).listAll();
@@ -73,15 +90,17 @@ class _FirebaseStorageFilePageState
                       padding: const EdgeInsets.symmetric(
                           vertical: MhMargins.standardPadding),
                       child: Text(
-                        'Orders In Progress',
+                        '$pharmacyName\nOrders In Progress',
                         style: MhTextStyle.heading4Style
                             .copyWith(color: MhColors.mhBlueLight),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     ...orders.map((order) =>
                         order.orderState == 'In Progress' &&
                                 order.isPrescriptionValid == true &&
-                                order.isOrderPayed == true
+                                order.isOrderPayed == true &&
+                                order.pharmacyName == pharmacyName
                             ? Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: MhMargins.mediumSmallMargin,

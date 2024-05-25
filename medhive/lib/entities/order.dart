@@ -13,6 +13,8 @@ class UserOrder {
   String? deliveryRiderId;
   double? riderLat;
   double? riderLong;
+  double? addressLat;
+  double? addressLong;
   bool isOrderPayed;
 
   UserOrder({
@@ -30,6 +32,8 @@ class UserOrder {
     this.deliveryRiderId,
     this.riderLat,
     this.riderLong,
+    this.addressLat,
+    this.addressLong,
     required this.isOrderPayed,
   });
 
@@ -49,6 +53,8 @@ class UserOrder {
       deliveryRiderId: json['deliveryRiderId'] as String?,
       riderLat: json['riderLat'] as double?,
       riderLong: json['riderLong'] as double?,
+      addressLat: json['addressLat'] as double?,
+      addressLong: json['addressLong'] as double?,
       isOrderPayed: json['isOrderPayed'] as bool,
     );
   }
@@ -69,6 +75,8 @@ class UserOrder {
       'deliveryRiderId': deliveryRiderId,
       'riderLat': riderLat,
       'riderLong': riderLong,
+      'addressLat': addressLat,
+      'addressLong': addressLong,
       'isOrderPayed': isOrderPayed,
     };
   }

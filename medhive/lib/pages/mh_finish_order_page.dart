@@ -39,9 +39,9 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
   Widget build(BuildContext context) {
     return StreamBuilder<List<Address>>(
         stream: _readAddresses(),
-        builder: (context, snapshot1) {
-          if (snapshot1.hasData) {
-            Address address = snapshot1.data!
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Address address = snapshot.data!
                 .where((element) =>
                     element.userId == AuthenticationService.currentUserId &&
                     element.isPrimary == true)
@@ -74,7 +74,8 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
                           final currentUser =
                               await firebaseController.readPrivateUser(
                                   AuthenticationService.currentUserId);
-                          _showProcessingDialog(context, currentUser, order.id);
+                          _showProcessingDialog(
+                              context, currentUser, order.id, address);
                         },
                         child: Container(
                           height: 70,
@@ -286,7 +287,7 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
                     );
                   }
                 });
-          } else if (snapshot1.hasError) {
+          } else if (snapshot.hasError) {
             return const Center(child: Text("Error"));
           } else {
             return const Center(
@@ -310,26 +311,37 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
       .map((snapshot) =>
           snapshot.docs.map((doc) => Address.fromJson(doc.data())).toList());
 
-  Future<void> _updatePrivateUserBankAccount(
-      double? currentBankAccount, double priceToPay) async {
+  Future<void> _updatePrivateUser(double? currentBankAccount, double priceToPay,
+      double latitude, double longitude) async {
     final collection = FirebaseFirestore.instance.collection('PrivateUsers');
 
     final docRef = collection.doc(AuthenticationService.currentUserId);
 
-    await docRef
-        .update({'bankAccount': (currentBankAccount ?? 0) - priceToPay});
+    await docRef.update({
+      'bankAccount': (currentBankAccount ?? 0) - priceToPay,
+      'addressLat': latitude,
+      'addressLong': longitude
+    });
   }
 
-  Future<void> _updateOrderIsPayed(String orderId) async {
+  Future<void> _updateOrder(String orderId, String orderAddress,
+      double latitude, double longitude) async {
     final collection = FirebaseFirestore.instance.collection('Orders');
 
     final docRef = collection.doc(orderId);
+    final totalPrice = widget.totalPrice + widget.pharmacy.deliveryCost;
 
-    await docRef.update({'isOrderPayed': true});
+    await docRef.update({
+      'isOrderPayed': true,
+      'totalPrice': totalPrice,
+      'location': orderAddress,
+      'addressLat': latitude,
+      'addressLong': longitude
+    });
   }
 
-  void _showProcessingDialog(
-      BuildContext context, PrivateUser? currentUser, String orderId) {
+  void _showProcessingDialog(BuildContext context, PrivateUser? currentUser,
+      String orderId, Address address) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -346,9 +358,16 @@ class _MhFinishOrderPageState extends ConsumerState<MhFinishOrderPage> {
                   success = true;
                 });
                 Future.delayed(const Duration(seconds: 3), () async {
-                  await _updatePrivateUserBankAccount(currentUser?.bankAccount,
-                      widget.totalPrice + widget.pharmacy.deliveryCost);
-                  await _updateOrderIsPayed(orderId);
+                  await _updatePrivateUser(
+                      currentUser?.bankAccount,
+                      widget.totalPrice + widget.pharmacy.deliveryCost,
+                      address.latitude,
+                      address.longitude);
+                  await _updateOrder(
+                      orderId,
+                      "${address.street}, ${address.location}",
+                      address.latitude,
+                      address.longitude);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
