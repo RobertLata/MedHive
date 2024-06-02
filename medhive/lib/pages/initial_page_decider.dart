@@ -20,7 +20,7 @@ class InitialPageDecider extends ConsumerWidget {
           if (data != null) {
             if (data.email == 'health.harmony@gmail.com' || data.email == 'wellspring.pharmacy@gmail.com' || data.email == 'apothecare.essentials@gmail.com' || data.email == 'vitagreen@gmail.com' || data.email == 'pillandleafwellness@gmail.com') {
               return const FirebaseStorageFilePage();
-            } else if (data.email != null && data.email!.contains('rider')) {
+            } else if (data.email == 'rider1@gmail.com' || data.email == 'rider2@gmail.com' || data.email == 'rider3@gmail.com' || data.email == 'rider4@gmail.com' || data.email == 'rider5@gmail.com') {
               return const RiderPage();
             } else {
               return const TabDecider();
