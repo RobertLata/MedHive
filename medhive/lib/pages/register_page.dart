@@ -40,7 +40,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   bool _isCheckboxChecked = false;
 
   // RegisterPage strings
-  String accountSetUp = "Create you free MedHive account";
+  String accountSetUp = "Create your free MedHive account";
   String emailText = "E-mail";
   String passwordText = "Password";
   String userNameText = "Username";
