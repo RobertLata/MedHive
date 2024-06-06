@@ -168,17 +168,6 @@ class AuthenticationService {
     return;
   }
 
-  Future<AuthenticationResponseEnum> signInWithApple(
-      BuildContext context) async {
-    final appleProvider = AppleAuthProvider();
-    try {
-      await FirebaseAuth.instance.signInWithProvider(appleProvider);
-    } catch (e) {
-      return AuthenticationResponseEnum.somethingWentWrong;
-    }
-    return AuthenticationResponseEnum.authSuccess;
-  }
-
   Future<void> deleteAccount() async {
     await _auth.currentUser?.delete();
     return;

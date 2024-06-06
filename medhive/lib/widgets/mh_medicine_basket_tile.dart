@@ -148,7 +148,7 @@ class _MedicineCardState extends ConsumerState<MhMedicineBasketTile> {
                               visible: !widget.noEditOption,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  if (medicineState.getMedicineDose(widget.medicine) > widget.medicine.quantity) {
+                                  if (medicineState.getMedicineDose(widget.medicine) >= widget.medicine.quantity) {
                                     showMhSnackbar(context, 'There are no ${widget.medicine.name} left');
                                     return;
                                   }

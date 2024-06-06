@@ -56,6 +56,11 @@ class MhMedicineTile extends ConsumerWidget {
                     style: MhTextStyle.bodyRegularStyle
                         .copyWith(color: MhColors.mhPurple),
                   ),
+                  Text(
+                    'In stock: ${medicine.quantity}',
+                    style: MhTextStyle.bodyRegularStyle
+                        .copyWith(color: MhColors.mhPurple),
+                  ),
                   InkWell(
                     onTap: () async {
                       if (medicine.sideEffects != null) {
@@ -154,14 +159,14 @@ class MhMedicineTile extends ConsumerWidget {
                       width: 80,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: MhMargins.mediumSmallMargin,
                   ),
                   Padding(
                     padding:
                         const EdgeInsets.only(top: MhMargins.standardPadding),
                     child: MhButton(
-                      text: 'Add to basket',
+                      text: 'Add',
                       width: 122,
                       height: 50,
                       onTap: () {
