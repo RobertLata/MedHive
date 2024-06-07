@@ -142,6 +142,7 @@ class _FirebaseStorageFilePageState
                                     .where((order) => order.id == file["name"])
                                     .firstOrNull;
                                 return order?.isPrescriptionValid == true ||
+                                        order?.isPrescriptionValid == false ||
                                         order == null
                                     ? const SizedBox()
                                     : Column(
@@ -157,17 +158,43 @@ class _FirebaseStorageFilePageState
                                               child: Text(file["url"]),
                                             ),
                                           ),
-                                          MhButton(
-                                            text: 'Approve',
-                                            width: 180,
-                                            onTap: () async {
-                                              UserOrder orderToValidate =
-                                                  orders.firstWhere((element) =>
-                                                      element.id ==
-                                                      file["name"]);
-                                              await _validateOrder(
-                                                  orderToValidate);
-                                            },
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              MhButton(
+                                                text: 'Approve',
+                                                width: 120,
+                                                onTap: () async {
+                                                  UserOrder orderToValidate =
+                                                      orders
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  file["name"]);
+                                                  await _validateOrder(
+                                                      orderToValidate);
+                                                },
+                                              ),
+                                              const SizedBox(
+                                                width:
+                                                    MhMargins.standardPadding,
+                                              ),
+                                              MhButton(
+                                                text: 'Decline',
+                                                width: 120,
+                                                onTap: () async {
+                                                  UserOrder orderToValidate =
+                                                      orders
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  file["name"]);
+                                                  await _declineOrder(
+                                                      orderToValidate);
+                                                },
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       );
@@ -277,6 +304,15 @@ class _FirebaseStorageFilePageState
 
     await docOrders.update({
       'isPrescriptionValid': true,
+    });
+  }
+
+  Future<void> _declineOrder(UserOrder order) async {
+    final docOrders =
+        FirebaseFirestore.instance.collection('Orders').doc(order.id);
+
+    await docOrders.update({
+      'isPrescriptionValid': false,
     });
   }
 }

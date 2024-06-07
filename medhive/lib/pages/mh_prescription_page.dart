@@ -39,7 +39,7 @@ class MhPrescriptionPage extends StatefulWidget {
 
 class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
   String scanResult = '';
-  bool isPrescriptionValid = false;
+  bool? isPrescriptionValid;
   late StreamSubscription<DocumentSnapshot> orderSubscription;
 
   @override
@@ -52,11 +52,9 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
         .listen((snapshot) {
       if (snapshot.exists) {
         var orderData = UserOrder.fromJson(snapshot.data()!);
-        if (orderData.isPrescriptionValid != isPrescriptionValid) {
-          setState(() {
-            isPrescriptionValid = orderData.isPrescriptionValid ?? false;
-          });
-        }
+        setState(() {
+          isPrescriptionValid = orderData.isPrescriptionValid;
+        });
       }
     });
   }
@@ -91,6 +89,8 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
                 },
               ),
             );
+          } else if (isPrescriptionValid == false) {
+            showMhSnackbar(context, 'Prescription declined.');
           } else {
             _showProcessingDialog(context);
           }
@@ -233,7 +233,7 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Your order is being processed. This shouldn't take long.",
+                "Your medical prescription is being processed. This shouldn't take long.",
                 style: MhTextStyle.bodyRegularStyle
                     .copyWith(color: MhColors.mhBlueLight),
               ),
@@ -252,11 +252,10 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
         .listen((snapshot) {
       if (snapshot.exists) {
         var orderData = UserOrder.fromJson(snapshot.data()!);
-        if (orderData.isPrescriptionValid != isPrescriptionValid) {
-          setState(() {
-            isPrescriptionValid = orderData.isPrescriptionValid ?? false;
-          });
-        }
+        setState(() {
+          isPrescriptionValid = orderData.isPrescriptionValid;
+        });
+
         if (orderData.isPrescriptionValid == true) {
           Navigator.of(context).pop();
           Navigator.of(context).pushReplacement(
@@ -273,6 +272,9 @@ class _MhPrescriptionPageState extends State<MhPrescriptionPage> {
               },
             ),
           );
+        } else if (orderData.isPrescriptionValid == false) {
+          Navigator.of(context).pop();
+          showMhSnackbar(context, 'Prescription declined.');
         }
       }
     });
