@@ -6,12 +6,10 @@ import 'mh_style.dart';
 
 ThemeData customTheme = ThemeData(
   //colors
-  backgroundColor: MhColors.mhWhite,
   disabledColor: MhColors.mhBlueDisabled,
   primaryColor: MhColors.mhBlueRegular,
   highlightColor: MhColors.mhBlueRegular,
   splashColor: Colors.transparent,
-
   textTheme: GoogleFonts.poppinsTextTheme(),
 
   //appbar
